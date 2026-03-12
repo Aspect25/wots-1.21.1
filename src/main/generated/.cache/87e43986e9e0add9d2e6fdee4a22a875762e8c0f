@@ -1,4 +1,4 @@
-// 1.21.1	2026-03-12T17:57:21.428772735	Wots/Block Loot Tables
+// 1.21.1	2026-03-12T20:21:32.813654582	Wots/Block Loot Tables
 56255b2b629fe6bdccd88b1ae8188a8f58c21c51 data/wots/loot_table/blocks/trash_block.json
 dce9d282dfaa37b6e3d493364fa1a15e85d22166 data/wots/loot_table/blocks/n_plush.json
 a8607d10e5e88f56277e1fdb24b66ed8a5cf8db0 data/wots/loot_table/blocks/uzi_plush_unamused.json
@@ -12,8 +12,8 @@ d4b08dc2679c9affaef8a45e604ad0cc8a94c0ba data/wots/loot_table/blocks/uzi_plush_w
 2ce4760693c674b60eb3f3975f0dcda4c01641b5 data/wots/loot_table/blocks/uzi_plush_ohno.json
 2262f5d5f407643dd3a21032478559f3aa43a337 data/wots/loot_table/blocks/uzi_plush_angyaf.json
 1464626a494e6e774f09ed82d0a444648914aa48 data/wots/loot_table/blocks/uzi_plush.json
-311826116e52050ceb471a4a7e5f36b9282c878f data/wots/loot_table/blocks/uzi_plush_scaredaf.json
 8d55467abbd1786f1101c2a1d292f584a37d751f data/wots/loot_table/blocks/custom_stonecutter.json
+311826116e52050ceb471a4a7e5f36b9282c878f data/wots/loot_table/blocks/uzi_plush_scaredaf.json
 db5c0e6972f4c13232c401e89cd51c50b57ddf5c data/wots/loot_table/blocks/uzi_plush_angy.json
 a9f284c8976d48a02dc49109896938779b89883e data/wots/loot_table/blocks/uzi_plush_happy.json
 a42ea1aef0e11f1ed6b1149e00dbf1a3d20fedb4 data/wots/loot_table/blocks/uzi_huge.json
