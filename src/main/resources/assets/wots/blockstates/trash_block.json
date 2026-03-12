@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "": {
+            "model": "wots:block/trash_block"
+        }
+    }
+}

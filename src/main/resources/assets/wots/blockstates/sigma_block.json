@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "wots:block/sigma",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "wots:block/sigma"
+    },
+    "facing=south": {
+      "model": "wots:block/sigma",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wots:block/sigma",
+      "y": 270
+    }
+  }
+}

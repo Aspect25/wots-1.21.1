@@ -1,0 +1,207 @@
+{
+  "j_noise": {
+    "subtitle": "sound.wots.j_noise",
+    "sounds": ["wots:j_noise"]
+  },
+  "cyn_noise_1": {
+    "subtitle": "sound.wots.cyn_noise_1",
+    "sounds": ["wots:cyn_noise_1"]
+
+  },
+  "fatass_noise": {
+    "subtitle": "sound.wots.fatass_noise",
+    "sounds": ["wots:fatass_noise"]
+
+  },
+  "uzi_noise": {
+    "subtitle": "sound.wots.uzi_noise",
+    "sounds": ["wots:uzi_noise"]
+  },
+  "cyn_noise_2": {
+    "subtitle": "sound.wots.cyn_noise_2",
+    "sounds": ["wots:cyn_noise_2"]
+
+  },
+  "cyn_noise_3": {
+    "subtitle": "sound.wots.cyn_noise_3",
+    "sounds": ["wots:cyn_noise_3"]
+
+  },
+  "cyn_noise_4": {
+    "subtitle": "sound.wots.cyn_noise_4",
+    "sounds": ["wots:cyn_noise_4"]
+
+  },
+  "cyn_noise_5": {
+    "subtitle": "sound.wots.cyn_noise_5",
+    "sounds": ["wots:cyn_noise_5"]
+
+  },
+  "cyn_noise_6": {
+    "subtitle": "sound.wots.cyn_noise_6",
+    "sounds": ["wots:cyn_noise_6"]
+
+  },
+  "n_noise_1": {
+    "subtitle": "sound.wots.n_noise_1",
+    "sounds": ["wots:n_noise_1"]
+
+  },
+  "n_noise_2": {
+    "subtitle": "sound.wots.n_noise_2",
+    "sounds": ["wots:n_noise_2"]
+
+  },
+  "n_noise_3": {
+    "subtitle": "sound.wots.n_noise_3",
+    "sounds": ["wots:n_noise_3"]
+
+  },
+  "n_noise_4": {
+    "subtitle": "sound.wots.n_noise_4",
+    "sounds": ["wots:n_noise_4"]
+
+  },
+  "n_noise_5": {
+    "subtitle": "sound.wots.n_noise_5",
+    "sounds": ["wots:n_noise_5"]
+
+  },
+  "n_noise_6": {
+    "subtitle": "sound.wots.n_noise_6",
+    "sounds": ["wots:n_noise_6"]
+
+  },
+  "n_noise_7": {
+    "subtitle": "sound.wots.n_noise_7",
+    "sounds": ["wots:n_noise_7"]
+
+  },
+  "n_noise_8": {
+    "subtitle": "sound.wots.n_noise_8",
+    "sounds": ["wots:n_noise_8"]
+
+  },
+  "n_noise_9": {
+    "subtitle": "sound.wots.n_noise_9",
+    "sounds": ["wots:n_noise_9"]
+
+  },
+  "n_noise_10": {
+    "subtitle": "sound.wots.n_noise_10",
+    "sounds": ["wots:n_noise_10"]
+
+  },
+  "n_noise_11": {
+    "subtitle": "sound.wots.n_noise_11",
+    "sounds": ["wots:n_noise_11"]
+
+  },
+  "n_noise_12": {
+    "subtitle": "sound.wots.n_noise_12",
+    "sounds": ["wots:n_noise_12"]
+
+  },
+  "n_noise_13": {
+    "subtitle": "sound.wots.n_noise_13",
+    "sounds": ["wots:n_noise_13"]
+
+  },
+  "n_noise_14": {
+    "subtitle": "sound.wots.n_noise_14",
+    "sounds": ["wots:n_noise_14"]
+
+  },
+  "n_noise_15": {
+    "subtitle": "sound.wots.n_noise_15",
+    "sounds": ["wots:n_noise_15"]
+
+  },
+  "uzi_noise_2": {
+    "subtitle": "sound.wots.uzi_noise_2",
+    "sounds": ["wots:uzi_noise_2"]
+
+  },
+  "uzi_noise_3": {
+    "subtitle": "sound.wots.uzi_noise_3",
+    "sounds": ["wots:uzi_noise_3"]
+
+  },
+  "uzi_noise_4": {
+    "subtitle": "sound.wots.uzi_noise_4",
+    "sounds": ["wots:uzi_noise_4"]
+
+  },
+  "uzi_noise_5": {
+    "subtitle": "sound.wots.uzi_noise_5",
+    "sounds": ["wots:uzi_noise_5"]
+
+  },
+  "uzi_noise_6": {
+    "subtitle": "sound.wots.uzi_noise_6",
+    "sounds": ["wots:uzi_noise_6"]
+
+  },
+  "trashed_1": {
+    "subtitle": "sound.wots.trashed_1",
+    "sounds": ["wots:trashed_1"]
+
+  },
+  "trashed_10": {
+    "subtitle": "sound.wots.trashed_10",
+    "sounds": ["wots:trashed_10"]
+
+  },
+    "trashed_5": {
+    "subtitle": "sound.wots.trashed_5",
+    "sounds": ["wots:trashed_5"]
+
+  },
+  "trashed_15": {
+    "subtitle": "sound.wots.trashed_15",
+    "sounds": ["wots:trashed_15"]
+
+  },
+  "trashed_20": {
+    "subtitle": "sound.wots.trashed_20",
+    "sounds": ["wots:trashed_20"]
+
+  },
+  "trashed_25": {
+    "subtitle": "sound.wots.trashed_25",
+    "sounds": ["wots:trashed_25"]
+
+  },
+  "trashed_30": {
+    "subtitle": "sound.wots.trashed_30",
+    "sounds": ["wots:trashed_30"]
+
+  },
+    "trashed_35": {
+    "subtitle": "sound.wots.trashed_35",
+    "sounds": ["wots:trashed_35"]
+
+  },
+    "trashed_40": {
+    "subtitle": "sound.wots.trashed_40",
+    "sounds": ["wots:trashed_40"]
+
+  },
+  "trashed_50": {
+    "subtitle": "sound.wots.trashed_50",
+    "sounds": ["wots:trashed_50"]
+
+  },
+  "trashed_69": {
+    "subtitle": "sound.wots.trashed_69",
+    "sounds": ["wots:trashed_69"]
+
+  },
+  "trashed_70": {
+    "subtitle": "sound.wots.trashed_70",
+    "sounds": ["wots:trashed_70"]
+
+  }
+
+}
+

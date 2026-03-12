@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "wots:block/uzi_plush_unamused" },
+    "facing=east": { "model": "wots:block/uzi_plush_unamused", "y": 90 },
+    "facing=south": { "model": "wots:block/uzi_plush_unamused","y": 180 },
+    "facing=west": { "model": "wots:block/uzi_plush_unamused","y": 270 }
+  }
+}

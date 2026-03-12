@@ -1,0 +1,20 @@
+// 1.21.1	2026-03-12T17:57:21.428772735	Wots/Block Loot Tables
+56255b2b629fe6bdccd88b1ae8188a8f58c21c51 data/wots/loot_table/blocks/trash_block.json
+dce9d282dfaa37b6e3d493364fa1a15e85d22166 data/wots/loot_table/blocks/n_plush.json
+a8607d10e5e88f56277e1fdb24b66ed8a5cf8db0 data/wots/loot_table/blocks/uzi_plush_unamused.json
+fce75855fd2eb5f37bc79e9e2e003cae827d4df1 data/wots/loot_table/blocks/uzi_plush_worriedaf.json
+2f359fff4ebecc75c570cf02c7195a8266d61951 data/wots/loot_table/blocks/plushie_shelf.json
+11cfb90a7908e92cb0d1bac777245e74f77e5477 data/wots/loot_table/blocks/uzi_plush_sadge.json
+d4b08dc2679c9affaef8a45e604ad0cc8a94c0ba data/wots/loot_table/blocks/uzi_plush_worried.json
+4a1650871d550e51fb952fa89394ac2477fb4c6a data/wots/loot_table/blocks/uzi_plush_traumatized.json
+127c368f27c3424cd8e3020cd5808bb83ce62a4c data/wots/loot_table/blocks/uzi_plush_drunk.json
+39efe7fee04b099a336252ecc5bfcf36918cf599 data/wots/loot_table/blocks/cyn_plush.json
+2ce4760693c674b60eb3f3975f0dcda4c01641b5 data/wots/loot_table/blocks/uzi_plush_ohno.json
+2262f5d5f407643dd3a21032478559f3aa43a337 data/wots/loot_table/blocks/uzi_plush_angyaf.json
+1464626a494e6e774f09ed82d0a444648914aa48 data/wots/loot_table/blocks/uzi_plush.json
+311826116e52050ceb471a4a7e5f36b9282c878f data/wots/loot_table/blocks/uzi_plush_scaredaf.json
+8d55467abbd1786f1101c2a1d292f584a37d751f data/wots/loot_table/blocks/custom_stonecutter.json
+db5c0e6972f4c13232c401e89cd51c50b57ddf5c data/wots/loot_table/blocks/uzi_plush_angy.json
+a9f284c8976d48a02dc49109896938779b89883e data/wots/loot_table/blocks/uzi_plush_happy.json
+a42ea1aef0e11f1ed6b1149e00dbf1a3d20fedb4 data/wots/loot_table/blocks/uzi_huge.json
+2ae025ba247bb5eb86036c4e38d7280ddbbd1ce1 data/wots/loot_table/blocks/uzi_plush_spooked.json

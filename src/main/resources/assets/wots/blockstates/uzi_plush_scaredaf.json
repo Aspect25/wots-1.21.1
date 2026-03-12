@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "wots:block/uzi_plush_scaredaf" },
+    "facing=east": { "model": "wots:block/uzi_plush_scaredaf", "y": 90 },
+    "facing=south": { "model": "wots:block/uzi_plush_scaredaf","y": 180 },
+    "facing=west": { "model": "wots:block/uzi_plush_scaredaf","y": 270 }
+  }
+}

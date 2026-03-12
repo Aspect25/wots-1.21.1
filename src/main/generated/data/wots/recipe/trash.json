@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "T": {
+      "item": "minecraft:iron_trapdoor"
+    }
+  },
+  "pattern": [
+    "ITI",
+    "I I",
+    "III"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wots:trash_block"
+  }
+}

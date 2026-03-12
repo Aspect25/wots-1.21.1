@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=east":  { "model": "wots:block/custom_stonecutter", "y": 90 },
+    "facing=north": { "model": "wots:block/custom_stonecutter" },
+    "facing=south": { "model": "wots:block/custom_stonecutter", "y": 180 },
+    "facing=west":  { "model": "wots:block/custom_stonecutter", "y": 270 }
+  }
+}

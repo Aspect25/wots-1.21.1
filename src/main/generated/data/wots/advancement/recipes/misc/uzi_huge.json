@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "wots:uzi_huge"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_uzi_plush": {
+      "conditions": {
+        "items": [
+          {
+            "items": "wots:uzi_plush"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_uzi_plush"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "wots:uzi_huge"
+    ]
+  }
+}
