@@ -117,7 +117,7 @@ public class ModBlocks {
 
     // ── Machines ──────────────────────────────────────────────────────────────
     public static final Block CUSTOM_STONECUTTER = registerBlock("custom_stonecutter",
-            new CustomStonecutterBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.STONE)));
+            new CustomStonecutterBlock(AbstractBlock.Settings.create().nonOpaque().sounds(ModSounds.TV_SOUND_GROUP)));
 
     public static final Block TRASH_BLOCK = registerBlock("trash_block",
             new TrashBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.STONE)));

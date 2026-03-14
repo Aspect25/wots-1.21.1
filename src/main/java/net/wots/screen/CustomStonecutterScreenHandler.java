@@ -16,6 +16,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
+import net.wots.sound.ModSounds;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class CustomStonecutterScreenHandler extends ScreenHandler {
                 context.run((w, pos) -> {
                     long time = w.getTime();
                     if (lastTakeTime != time) {
-                        w.playSound(null, pos, SoundEvents.UI_STONECUTTER_TAKE_RESULT,
+                        w.playSound(null, pos, ModSounds.TV_USE,
                                 SoundCategory.BLOCKS, 1.0f, 1.0f);
                         lastTakeTime = time;
                     }
