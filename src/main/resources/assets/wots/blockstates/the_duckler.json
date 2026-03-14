@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=east":  { "model": "wots:block/the_duckler", "y": 90 },
+    "facing=north": { "model": "wots:block/the_duckler" },
+    "facing=south": { "model": "wots:block/the_duckler", "y": 180 },
+    "facing=west":  { "model": "wots:block/the_duckler", "y": 270 }
+  }
+}

@@ -5,15 +5,13 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.wots.Wots;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class ModSounds {
+
+    // -------------------------------------------------------------------------
+    // Existing sounds (your originals — untouched)
+    // -------------------------------------------------------------------------
     public static final SoundEvent CHISEL_USE = registerSoundEvent("chisel_use");
 
     public static final SoundEvent J_NOISE = registerSoundEvent("j_noise");
@@ -58,21 +56,84 @@ public class ModSounds {
     public static final SoundEvent TRASHED_69 = registerSoundEvent("trashed_69");
     public static final SoundEvent TRASHED_70 = registerSoundEvent("trashed_70");
 
+    // -------------------------------------------------------------------------
+    // Duckler sounds
+    // -------------------------------------------------------------------------
+    public static final SoundEvent DUCKLER_BREAK = registerSoundEvent("duckler_break");
+    public static final SoundEvent DUCKLER_STEP  = registerSoundEvent("duckler_step");
+    public static final SoundEvent DUCKLER_PLACE = registerSoundEvent("duckler_place");
+    public static final SoundEvent DUCKLER_HIT   = registerSoundEvent("duckler_hit");
+    public static final SoundEvent DUCKLER_FALL  = registerSoundEvent("duckler_fall");
 
+    // -------------------------------------------------------------------------
+    // Plush sounds
+    // -------------------------------------------------------------------------
+    public static final SoundEvent PLUSH_BREAK = registerSoundEvent("plush_break");
+    public static final SoundEvent PLUSH_STEP  = registerSoundEvent("plush_step");
+    public static final SoundEvent PLUSH_PLACE = registerSoundEvent("plush_place");
+    public static final SoundEvent PLUSH_HIT   = registerSoundEvent("plush_hit");
+    public static final SoundEvent PLUSH_FALL  = registerSoundEvent("plush_fall");
 
+    // -------------------------------------------------------------------------
+    // TV sounds
+    // -------------------------------------------------------------------------
+    public static final SoundEvent TV_BREAK = registerSoundEvent("tv_break");
+    public static final SoundEvent TV_STEP  = registerSoundEvent("tv_step");
+    public static final SoundEvent TV_PLACE = registerSoundEvent("tv_place");
+    public static final SoundEvent TV_HIT   = registerSoundEvent("tv_hit");
+    public static final SoundEvent TV_FALL  = registerSoundEvent("tv_fall");
+    public static final SoundEvent TV_USE   = registerSoundEvent("tv_use");
 
+    // -------------------------------------------------------------------------
+    // Misc sounds
+    // -------------------------------------------------------------------------
+    public static final SoundEvent STATIC      = registerSoundEvent("static");
+    public static final SoundEvent DUCK_SOUND  = registerSoundEvent("duck_sound");
+    public static final SoundEvent UZI_NOISE_7 = registerSoundEvent("uzi_noise_7");
 
+    // =========================================================================
+    // Block Sound Groups
+    // BlockSoundGroup(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound)
+    // =========================================================================
 
+    public static final BlockSoundGroup DUCKLER_SOUND_GROUP = new BlockSoundGroup(
+            1.0f, 1.0f,
+            DUCKLER_BREAK,
+            DUCKLER_STEP,
+            DUCKLER_PLACE,
+            DUCKLER_HIT,
+            DUCKLER_FALL
+    );
 
+    public static final BlockSoundGroup PLUSH_SOUND_GROUP = new BlockSoundGroup(
+            1.0f, 1.0f,
+            PLUSH_BREAK,
+            PLUSH_STEP,
+            PLUSH_PLACE,
+            PLUSH_HIT,
+            PLUSH_FALL
+    );
+
+    public static final BlockSoundGroup TV_SOUND_GROUP = new BlockSoundGroup(
+            1.0f, 1.0f,
+            TV_BREAK,
+            TV_STEP,
+            TV_PLACE,
+            TV_HIT,
+            TV_FALL
+    );
+
+    // =========================================================================
+    // Helpers
+    // =========================================================================
 
     private static SoundEvent registerSoundEvent(String name) {
         Identifier id = Identifier.of(Wots.MOD_ID, name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 
-
-
-    public static void registerSounds() {
-        Wots.LOGGER.info("Registering Mod Sounds for " + Wots.MOD_ID);
+    public static void registerModSounds() {
+        // Loading this class is enough — all statics self-register on access.
+        // Call this from your ModInitializer to ensure early registration.
     }
 }

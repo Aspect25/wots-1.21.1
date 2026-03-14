@@ -14,40 +14,42 @@ import net.wots.block.entity.*;
 import net.wots.block.plushies.cynplush.CynPlushBlock;
 import net.wots.block.plushies.nplush.NPlushBlock;
 import net.wots.block.plushies.tadc.sigma.SigmaBlock;
+import net.wots.block.plushies.the_duckler.TheDucklerPlush;
 import net.wots.block.plushies.uziplush.UziHugeBlock;
 import net.wots.block.plushies.uziplush.UziHugePhantomBlock;
 import net.wots.block.plushies.uziplush.UziPlushBlock;
 import net.wots.item.TrashBlockItem;
+import net.wots.sound.ModSounds;
 
 public class ModBlocks {
 
     // ── Plushies ──────────────────────────────────────────────────────────────
     public static final Block UZI_PLUSH = registerBlock("uzi_plush",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_SADGE = registerBlock("uzi_plush_sadge",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_SCAREDAF = registerBlock("uzi_plush_scaredaf",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_SPOOKED = registerBlock("uzi_plush_spooked",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
-    public static final Block UZI_PLUSH_TRAUMATIZED = registerBlock("uzi_plush_traumatized", // 🐛 fixed: was "uzi_plush_scaredaf"
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
+    public static final Block UZI_PLUSH_TRAUMATIZED = registerBlock("uzi_plush_traumatized",
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_UNAMUSED = registerBlock("uzi_plush_unamused",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_ANGY = registerBlock("uzi_plush_angy",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_ANGYAF = registerBlock("uzi_plush_angyaf",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_DRUNK = registerBlock("uzi_plush_drunk",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_HAPPY = registerBlock("uzi_plush_happy",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_WORRIEDAF = registerBlock("uzi_plush_worriedaf",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_WORRIED = registerBlock("uzi_plush_worried",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final Block UZI_PLUSH_OHNO = registerBlock("uzi_plush_ohno",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     // All variants listed in the block entity registration
     public static final BlockEntityType<UziPlushBlockEntity> UZI_PLUSH_BLOCK_ENTITY =
             Registry.register(
@@ -64,37 +66,42 @@ public class ModBlocks {
 
 
     public static final Block N_PLUSH = registerBlock("n_plush",
-            new NPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new NPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final BlockEntityType<NPlushBlockEntity> N_PLUSH_BLOCK_ENTITY =
             Registry.register(
                     Registries.BLOCK_ENTITY_TYPE,
                     Identifier.of(Wots.MOD_ID, "n_plush"),
                     BlockEntityType.Builder.create(NPlushBlockEntity::new, N_PLUSH).build()
             );
-    public static final UziHugeBlock UZI_HUGE = registerBlock("uzi_huge",
-            new UziHugeBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
 
+    public static final UziHugeBlock UZI_HUGE = registerBlock("uzi_huge",
+            new UziHugeBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final BlockEntityType<UziHugeBlockEntity> UZI_HUGE_BLOCK_ENTITY =
             Registry.register(Registries.BLOCK_ENTITY_TYPE,
                     Identifier.of("wots", "uzi_huge_block_entity"),
                     BlockEntityType.Builder.create(UziHugeBlockEntity::new, UZI_HUGE).build());
+
     public static final UziHugePhantomBlock UZI_HUGE_PHANTOM = registerBlock("uzi_huge_phantom",
             new UziHugePhantomBlock(AbstractBlock.Settings.create()
-                    .noCollision()        // collision handled by VoxelShape override
+                    .noCollision()
                     .noBlockBreakParticles()
-                    .sounds(BlockSoundGroup.WOOL)));
+                    .strength(0.1f)
+                    .sounds(ModSounds.PLUSH_SOUND_GROUP)));
+
     public static final CynPlushBlock CYN_PLUSH = registerBlock("cyn_plush",
-            new CynPlushBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL)));
+            new CynPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final BlockEntityType<CynPlushBlockEntity> CYN_PLUSH_BLOCK_ENTITY =
             Registry.register(
                     Registries.BLOCK_ENTITY_TYPE,
                     Identifier.of(Wots.MOD_ID, "cyn_plush"),
                     BlockEntityType.Builder.create(CynPlushBlockEntity::new, CYN_PLUSH).build());
 
+
     public static final SigmaBlock SIGMA_BLOCK = registerBlock("sigma_block",
             new SigmaBlock(AbstractBlock.Settings.create().nonOpaque().sounds(BlockSoundGroup.WOOL))
     );
-
+    public static final TheDucklerPlush THE_DUCKLER = registerBlock("the_duckler",
+            new TheDucklerPlush(AbstractBlock.Settings.create().nonOpaque().strength(0.5f).sounds(ModSounds.DUCKLER_SOUND_GROUP)));
 
 
     public static final BlockEntityType<SigmaBlockEntity> SIGMA_BLOCK_ENTITY = Registry.register(

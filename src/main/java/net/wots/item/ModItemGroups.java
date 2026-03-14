@@ -38,6 +38,7 @@ public class ModItemGroups {
                         entries.add(ModBlocks.UZI_HUGE);
                         entries.add(ModBlocks.CYN_PLUSH);
                         entries.add(ModBlocks.SIGMA_BLOCK);
+                        entries.add(ModBlocks.THE_DUCKLER);
                     }).build());
 
 

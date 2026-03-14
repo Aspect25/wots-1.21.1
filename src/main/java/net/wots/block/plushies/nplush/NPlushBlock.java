@@ -5,12 +5,9 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -20,33 +17,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.wots.block.entity.NPlushBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
-import net.wots.sound.ModSounds;
-
-import java.util.*;
 
 public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider {
 
-    private static final Map<SoundEvent, Integer> SOUND_DURATIONS_N = Map.ofEntries(
-            Map.entry(ModSounds.N_NOISE_1,  20),
-            Map.entry(ModSounds.N_NOISE_2,  20),
-            Map.entry(ModSounds.N_NOISE_3,  20),
-            Map.entry(ModSounds.N_NOISE_4,  20),
-            Map.entry(ModSounds.N_NOISE_5,  40),
-            Map.entry(ModSounds.N_NOISE_6,  120),
-            Map.entry(ModSounds.N_NOISE_7,  100),
-            Map.entry(ModSounds.N_NOISE_8,  20),
-            Map.entry(ModSounds.N_NOISE_9,  20),
-            Map.entry(ModSounds.N_NOISE_10, 20),
-            Map.entry(ModSounds.N_NOISE_11, 20),
-            Map.entry(ModSounds.N_NOISE_12, 20),
-            Map.entry(ModSounds.N_NOISE_13, 20),
-            Map.entry(ModSounds.N_NOISE_14, 20),
-            Map.entry(ModSounds.N_NOISE_15, 100)
-    );
-
-    private static final List<SoundEvent> SOUNDS = new ArrayList<>(SOUND_DURATIONS_N.keySet());
-    private static final Map<BlockPos, Long> SOUND_COOLDOWNS = new HashMap<>();
-    private static int soundIndex = 0;
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
     // ── Shape ─────────────────────────────────────────────────────────────────
@@ -92,6 +65,16 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
         return SHAPE;
     }
 
+    // ── Stop sound on break ───────────────────────────────────────────────────
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof NPlushBlockEntity blockEntity) {
+            blockEntity.stopSound();
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    // ── Interaction ───────────────────────────────────────────────────────────
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos,
                                  PlayerEntity player, BlockHitResult hit) {
@@ -101,23 +84,10 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
 
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        if (!world.isClient) {
-            long currentTime = world.getTime();
-            BlockPos key = shelfPos.add(slot, 0, 0);
-            long cooldownEnd = SOUND_COOLDOWNS.getOrDefault(key, 0L);
-
-            if (currentTime < cooldownEnd) return;
-
-            if (soundIndex == 0) Collections.shuffle(SOUNDS);
-
-            SoundEvent randomSound = SOUNDS.get(soundIndex);
-            soundIndex = (soundIndex + 1) % SOUNDS.size();
-
-            SOUND_COOLDOWNS.put(key, currentTime + SOUND_DURATIONS_N.get(randomSound));
-            world.playSound(null, shelfPos, randomSound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof NPlushBlockEntity blockEntity) {
+            blockEntity.playNextSound();
         }
 
-        // Trigger the animation client-side only
         if (world.isClient && world.getBlockEntity(shelfPos) instanceof NPlushBlockEntity blockEntity) {
             blockEntity.triggerAnim("controller", "bounce");
         }
