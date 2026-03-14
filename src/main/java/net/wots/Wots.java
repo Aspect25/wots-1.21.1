@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 
 import net.wots.block.ModBlocks;
 import net.wots.item.ModItemGroups;
+import net.wots.network.SetUziVariantPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.wots.block.CustomStonecutterBlock;
@@ -27,7 +28,6 @@ import net.minecraft.util.Identifier;
 
 public class Wots implements ModInitializer {
 
-
 	public static final String MOD_ID = "wots";
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -49,7 +49,7 @@ public class Wots implements ModInitializer {
 	public void onInitialize() {
 		ModBlocks.registerModBlock();
 		ModItemGroups.registerItemGroups();
-
+		SetUziVariantPayload.registerServer(); // ← ADD THIS
 
 
 

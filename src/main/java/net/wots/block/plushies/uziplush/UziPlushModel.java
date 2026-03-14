@@ -14,9 +14,10 @@ public class UziPlushModel extends GeoModel<UziPlushBlockEntity> {
 
     @Override
     public Identifier getTextureResource(UziPlushBlockEntity entity) {
-        // Gets the block's registry name e.g. "uzi_plush_sadge"
-        String blockName = Registries.BLOCK.getId(entity.getCachedState().getBlock()).getPath();
-        return Identifier.of("wots", "textures/block/" + blockName + ".png");
+        // Was: reading the block registry name (never changes)
+        // Now: reading the variant stored in the BlockEntity
+        String textureName = entity.getVariant().name().toLowerCase();
+        return Identifier.of("wots", "textures/block/" + textureName + ".png");
     }
     @Override
     public Identifier getAnimationResource(UziPlushBlockEntity entity) {

@@ -3,6 +3,8 @@ package net.wots.block.plushies.uziplush;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
@@ -16,6 +18,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.wots.block.ModBlocks;
 import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
 
@@ -23,7 +26,6 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
-    // ── VoxelShapes ───────────────────────────────────────────────────────────
     private static final VoxelShape SHAPE_NORTH = makeShape();
     private static final VoxelShape SHAPE_SOUTH = rotateShape(SHAPE_NORTH, 2);
     private static final VoxelShape SHAPE_EAST  = rotateShape(SHAPE_NORTH, 1);
@@ -34,12 +36,8 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
             double x1 = minX, z1 = minZ, x2 = maxX, z2 = maxZ;
             for (int i = 0; i < times; i++) {
-                double newX1 = 1 - z2;
-                double newZ1 = x1;
-                double newX2 = 1 - z1;
-                double newZ2 = x2;
-                x1 = newX1; z1 = newZ1;
-                x2 = newX2; z2 = newZ2;
+                double newX1 = 1 - z2, newZ1 = x1, newX2 = 1 - z1, newZ2 = x2;
+                x1 = newX1; z1 = newZ1; x2 = newX2; z2 = newZ2;
             }
             buffer[0] = VoxelShapes.combine(buffer[0],
                     VoxelShapes.cuboid(x1, minY, z1, x2, maxY, z2),
@@ -52,7 +50,6 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
     }
 
-    // ── Constructor ───────────────────────────────────────────────────────────
     public UziPlushBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
@@ -83,7 +80,13 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return new UziPlushBlockEntity(pos, state);
     }
 
-    // ── Shapes ────────────────────────────────────────────────────────────────
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        if (world.isClient) return null;
+        if (type != ModBlocks.UZI_PLUSH_BLOCK_ENTITY) return null;
+        //noinspection unchecked
+        return (BlockEntityTicker<T>) (BlockEntityTicker<UziPlushBlockEntity>) UziPlushBlockEntity::tick;
+    }
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
         return switch (state.get(FACING)) {
@@ -99,31 +102,35 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return getOutlineShape(state, world, pos, ctx);
     }
 
-    // ── Stop sound on break ───────────────────────────────────────────────────
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof UziPlushBlockEntity blockEntity) {
-            blockEntity.stopSound();
+        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof UziPlushBlockEntity be) {
+            be.stopSound();
         }
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    // ── Interaction ───────────────────────────────────────────────────────────
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos,
                                  PlayerEntity player, BlockHitResult hit) {
+        if (player.isSneaking()) {
+            if (world.isClient) {
+                net.minecraft.client.MinecraftClient.getInstance()
+                        .setScreen(new net.wots.client.screen.UziVariantWheelScreen(pos));
+            }
+            return ActionResult.SUCCESS;
+        }
         onShelfInteract(world, pos, 0, player);
         return ActionResult.SUCCESS;
     }
 
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof UziPlushBlockEntity blockEntity) {
-            blockEntity.playNextSound();
+        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof UziPlushBlockEntity be) {
+            be.playNextSound();
         }
-
-        if (world.isClient && world.getBlockEntity(shelfPos) instanceof UziPlushBlockEntity blockEntity) {
-            blockEntity.triggerAnim("controller", "bounce");
+        if (world.isClient && world.getBlockEntity(shelfPos) instanceof UziPlushBlockEntity be) {
+            be.triggerAnim("controller", "bounce");
         }
     }
 }
