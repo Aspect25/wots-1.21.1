@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.wots.block.ModBlocks;
 import net.wots.item.ModItemGroups;
+import net.wots.network.SetNVariantPayload;
 import net.wots.network.SetUziVariantPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,8 @@ public class Wots implements ModInitializer {
 	public void onInitialize() {
 		ModBlocks.registerModBlock();
 		ModItemGroups.registerItemGroups();
-		SetUziVariantPayload.registerServer(); // ← ADD THIS
+		SetUziVariantPayload.registerServer();
+		SetNVariantPayload.registerServer();
 
 
 

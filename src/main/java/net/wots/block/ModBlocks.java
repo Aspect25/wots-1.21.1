@@ -1,5 +1,6 @@
 package net.wots.block;
 
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
@@ -27,43 +28,15 @@ public class ModBlocks {
     // ── Plushies ──────────────────────────────────────────────────────────────
     public static final Block UZI_PLUSH = registerBlock("uzi_plush",
             new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_SADGE = registerBlock("uzi_plush_sadge",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_SCAREDAF = registerBlock("uzi_plush_scaredaf",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_SPOOKED = registerBlock("uzi_plush_spooked",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_TRAUMATIZED = registerBlock("uzi_plush_traumatized",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_UNAMUSED = registerBlock("uzi_plush_unamused",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_ANGY = registerBlock("uzi_plush_angy",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_ANGYAF = registerBlock("uzi_plush_angyaf",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_DRUNK = registerBlock("uzi_plush_drunk",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_HAPPY = registerBlock("uzi_plush_happy",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_WORRIEDAF = registerBlock("uzi_plush_worriedaf",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_WORRIED = registerBlock("uzi_plush_worried",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
-    public static final Block UZI_PLUSH_OHNO = registerBlock("uzi_plush_ohno",
-            new UziPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
+
     // All variants listed in the block entity registration
     public static final BlockEntityType<UziPlushBlockEntity> UZI_PLUSH_BLOCK_ENTITY =
             Registry.register(
                     Registries.BLOCK_ENTITY_TYPE,
                     Identifier.of(Wots.MOD_ID, "uzi_plush"),
                     BlockEntityType.Builder.create(UziPlushBlockEntity::new,
-                            UZI_PLUSH, UZI_PLUSH_SADGE, UZI_PLUSH_SCAREDAF,
-                            UZI_PLUSH_SPOOKED, UZI_PLUSH_TRAUMATIZED, UZI_PLUSH_UNAMUSED,
-                            UZI_PLUSH_ANGY, UZI_PLUSH_ANGYAF, UZI_PLUSH_DRUNK,
-                            UZI_PLUSH_HAPPY, UZI_PLUSH_WORRIEDAF, UZI_PLUSH_WORRIED,
-                            UZI_PLUSH_OHNO).build()
+                            UZI_PLUSH).build()
             );
-
 
 
     public static final Block N_PLUSH = registerBlock("n_plush",
@@ -132,6 +105,7 @@ public class ModBlocks {
 
 
 
+
     // ── Machines ──────────────────────────────────────────────────────────────
     public static final Block CUSTOM_STONECUTTER = registerBlock("custom_stonecutter",
             new CustomStonecutterBlock(AbstractBlock.Settings.create().nonOpaque().sounds(ModSounds.TV_SOUND_GROUP)));
@@ -181,5 +155,8 @@ public class ModBlocks {
 
     public static void registerModBlock() {
         Wots.LOGGER.info("Registering Mod Blocks for " + Wots.MOD_ID);
+        FuelRegistry.INSTANCE.add(UZI_PLUSH.asItem(), 100);
+        FuelRegistry.INSTANCE.add(N_PLUSH.asItem(),   100);
+
     }
 }

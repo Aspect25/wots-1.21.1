@@ -20,18 +20,6 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
 
         getOrCreateTagBuilder(ModTags.Blocks.UZI_PLUSHIES)
                 .add(ModBlocks.UZI_PLUSH)
-                .add(ModBlocks.UZI_PLUSH_SADGE)
-                .add(ModBlocks.UZI_PLUSH_SPOOKED)
-                .add(ModBlocks.UZI_PLUSH_TRAUMATIZED)
-                .add(ModBlocks.UZI_PLUSH_UNAMUSED)
-                .add(ModBlocks.UZI_PLUSH_SCAREDAF)
-                .add(ModBlocks.UZI_PLUSH_ANGY)
-                .add(ModBlocks.UZI_PLUSH_ANGYAF)
-                .add(ModBlocks.UZI_PLUSH_DRUNK)
-                .add(ModBlocks.UZI_PLUSH_HAPPY)
-                .add(ModBlocks.UZI_PLUSH_OHNO)
-                .add(ModBlocks.UZI_PLUSH_WORRIED)
-                .add(ModBlocks.UZI_PLUSH_WORRIEDAF)
                 .add(ModBlocks.UZI_HUGE);
 
 
@@ -39,18 +27,6 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
         getOrCreateTagBuilder(BlockTags.WOOL)
                 .add(ModBlocks.UZI_PLUSH)
                 .add(ModBlocks.N_PLUSH)
-                .add(ModBlocks.UZI_PLUSH_SADGE)
-                .add(ModBlocks.UZI_PLUSH_SPOOKED)
-                .add(ModBlocks.UZI_PLUSH_TRAUMATIZED)
-                .add(ModBlocks.UZI_PLUSH_UNAMUSED)
-                .add(ModBlocks.UZI_PLUSH_SCAREDAF)
-                .add(ModBlocks.UZI_PLUSH_ANGY)
-                .add(ModBlocks.UZI_PLUSH_ANGYAF)
-                .add(ModBlocks.UZI_PLUSH_DRUNK)
-                .add(ModBlocks.UZI_PLUSH_HAPPY)
-                .add(ModBlocks.UZI_PLUSH_OHNO)
-                .add(ModBlocks.UZI_PLUSH_WORRIED)
-                .add(ModBlocks.UZI_PLUSH_WORRIEDAF)
                 .add(ModBlocks.UZI_HUGE)
                 .add(ModBlocks.CYN_PLUSH);
 

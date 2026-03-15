@@ -21,24 +21,13 @@ public class ModItemGroups {
                         entries.add(ModBlocks.UZI_PLUSH);
                         entries.add(ModBlocks.N_PLUSH);
                         entries.add(ModBlocks.CUSTOM_STONECUTTER);
-                        entries.add(ModBlocks.UZI_PLUSH_SADGE);
-                        entries.add(ModBlocks.UZI_PLUSH_SCAREDAF);
-                        entries.add(ModBlocks.UZI_PLUSH_SPOOKED);
-                        entries.add(ModBlocks.UZI_PLUSH_TRAUMATIZED);
-                        entries.add(ModBlocks.UZI_PLUSH_UNAMUSED);
-                        entries.add(ModBlocks.UZI_PLUSH_ANGY);
-                        entries.add(ModBlocks.UZI_PLUSH_ANGYAF);
-                        entries.add(ModBlocks.UZI_PLUSH_DRUNK);
-                        entries.add(ModBlocks.UZI_PLUSH_HAPPY);
-                        entries.add(ModBlocks.UZI_PLUSH_OHNO);
-                        entries.add(ModBlocks.UZI_PLUSH_WORRIED);
-                        entries.add(ModBlocks.UZI_PLUSH_WORRIEDAF);
                         entries.add(ModBlocks.PLUSHIE_SHELF);
                         entries.add(ModBlocks.TRASH_BLOCK);
                         entries.add(ModBlocks.UZI_HUGE);
                         entries.add(ModBlocks.CYN_PLUSH);
                         entries.add(ModBlocks.SIGMA_BLOCK);
                         entries.add(ModBlocks.THE_DUCKLER);
+                        entries.add(ModBlocks.LUMINITE_BLOCK);
                     }).build());
 
 

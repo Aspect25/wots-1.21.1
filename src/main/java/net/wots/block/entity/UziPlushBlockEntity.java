@@ -67,7 +67,8 @@ public class UziPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
     }
 
     // ── Sound ─────────────────────────────────────────────────────────────────
-    private static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
+    // public so UziPlushBlock can reference durations for shelf-slot sound state
+    public static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
             Map.entry(ModSounds.UZI_NOISE,   80),
             Map.entry(ModSounds.UZI_NOISE_2, 20),
             Map.entry(ModSounds.UZI_NOISE_3, 40),

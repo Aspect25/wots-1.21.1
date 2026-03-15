@@ -13,7 +13,8 @@ public enum UziPlushVariant {
     UZI_PLUSH_HAPPY    ("Happy",         0xF0C030),
     UZI_PLUSH_WORRIEDAF("Worried AF",    0xDB8A3A),
     UZI_PLUSH_WORRIED  ("Worried",       0xD4A870),
-    UZI_PLUSH_OHNO     ("Oh No",         0xE05A80);
+    UZI_PLUSH_OHNO     ("Oh No",         0xE05A80),
+    UZI_PLUSH_SMIRK    ("Smirk",         0xB07FC4);
 
     public final String displayName;
     public final int color;
