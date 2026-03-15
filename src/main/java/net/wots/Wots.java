@@ -2,6 +2,9 @@ package net.wots;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.wots.block.ModBlocks;
 import net.wots.item.ModItemGroups;
 import net.wots.network.SetUziVariantPayload;
@@ -66,5 +69,11 @@ public class Wots implements ModInitializer {
 						FeatureFlags.VANILLA_FEATURES
 				)
 		);
+		ResourceManagerHelper.registerBuiltinResourcePack(
+				Identifier.of("wots", "luminite-shaders"),
+				FabricLoader.getInstance().getModContainer("wots").orElseThrow(),
+				ResourcePackActivationType.ALWAYS_ENABLED
+		);
+
 	}
 }

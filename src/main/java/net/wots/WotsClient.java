@@ -1,9 +1,13 @@
 package net.wots;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
+import net.minecraft.util.Identifier;
 import net.wots.block.ModBlocks;
+import net.wots.block.luminite.LuminiteEmissiveModel;
 import net.wots.client.CustomStonecutterScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.wots.client.renderer.*;
@@ -22,4 +26,5 @@ public class WotsClient implements ClientModInitializer {
         BlockEntityRendererFactories.register(ModBlocks.CYN_PLUSH_BLOCK_ENTITY, CynPlushBlockEntityRenderer::new);
         BlockEntityRendererRegistry.register(ModBlocks.SIGMA_BLOCK_ENTITY, SigmaBlockEntityRenderer::new);
     }
+
 }

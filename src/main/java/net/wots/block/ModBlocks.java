@@ -11,6 +11,7 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.wots.Wots;
 import net.wots.block.entity.*;
+import net.wots.block.luminite.LuminiteBlock;
 import net.wots.block.plushies.cynplush.CynPlushBlock;
 import net.wots.block.plushies.nplush.NPlushBlock;
 import net.wots.block.plushies.tadc.sigma.SigmaBlock;
@@ -108,6 +109,22 @@ public class ModBlocks {
             Registries.BLOCK_ENTITY_TYPE,
             Identifier.of(Wots.MOD_ID, "sigma_entity"),
             BlockEntityType.Builder.create(SigmaBlockEntity::new, ModBlocks.SIGMA_BLOCK).build(null)
+    );
+    public static final Block LUMINITE_BLOCK = registerBlock("luminite_block",
+            new LuminiteBlock(
+                    AbstractBlock.Settings.create()
+                            .strength(1.5f, 6.0f)
+                            .luminance(state -> {
+                                if (!state.get(LuminiteBlock.LIT)) return 0;
+                                // Soft ambient glow — max level 9 instead of blinding 15
+                                return Math.round(state.get(LuminiteBlock.POWER) * 0.6f);
+                            })
+                            .sounds(BlockSoundGroup.AMETHYST_BLOCK)
+                            // Emissive: block face renders at full brightness regardless of light level
+                            // Also tells Iris shaders to cast colored light from the texture
+                            .emissiveLighting((state, world, pos) -> state.get(LuminiteBlock.LIT))
+                            .nonOpaque()
+            )
     );
 
 

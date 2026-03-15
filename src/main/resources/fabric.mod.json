@@ -3,9 +3,9 @@
 	"id": "wots",
 	"version": "${version}",
 	"name": "Wots",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Da plushie mod",
 	"authors": [
-		"Me!"
+		"FervantPlate"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",

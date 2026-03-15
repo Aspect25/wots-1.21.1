@@ -1,0 +1,12 @@
+{
+  "multipart": [
+    {
+      "when": { "lit": "true" },
+      "apply": { "model": "wots:block/luminite_block_lit" }
+    },
+    {
+      "when": { "lit": "false" },
+      "apply": { "model": "wots:block/luminite_block_unlit" }
+    }
+  ]
+}
