@@ -27,74 +27,12 @@ import java.util.*;
 public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvider {
     public static final List<BlockPos> OFFSETS = new ArrayList<>();
     static {
-        // Sort by Y so lower layers are placed first
         for (int y = 0; y <= 2; y++)
             for (int x = -1; x <= 1; x++)
                 for (int z = -1; z <= 1; z++)
                     if (x != 0 || y != 0 || z != 0)
                         OFFSETS.add(new BlockPos(x, y, z));
     }
-    // ... (keep all your existing sounds, constructor, codec etc.) ...
-
-
-    @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-        for (BlockPos offset : OFFSETS) {
-            BlockState existing = world.getBlockState(pos.add(offset));
-            // Allow air AND any replaceable block (grass, flowers, etc.)
-            if (!existing.isAir() && !existing.isReplaceable()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state,
-                         LivingEntity placer, ItemStack stack) {
-        System.out.println("[UziHuge] onPlaced called, isClient=" + world.isClient);
-        if (world.isClient) return;
-
-        System.out.println("[UziHuge] phantom block is: " + ModBlocks.UZI_HUGE_PHANTOM);
-
-        for (BlockPos offset : OFFSETS) {
-            BlockPos phantomPos = pos.add(offset);
-
-            boolean placed = world.setBlockState(phantomPos,
-                    ModBlocks.UZI_HUGE_PHANTOM.getDefaultState(),
-                    Block.NOTIFY_ALL);
-
-            System.out.println("[UziHuge] placing phantom at " + phantomPos + " -> success=" + placed);
-
-            if (!placed) {
-                System.out.println("[UziHuge] ROLLBACK triggered at " + phantomPos);
-                for (BlockPos rollback : OFFSETS) {
-                    BlockPos rbPos = pos.add(rollback);
-                    if (world.getBlockState(rbPos).getBlock() instanceof UziHugePhantomBlock) {
-                        world.removeBlock(rbPos, false);
-                    }
-                }
-                world.removeBlock(pos, false);
-                return;
-            }
-        }
-        System.out.println("[UziHuge] All phantoms placed successfully!");
-    }
-
-    @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        // Must remove phantoms HERE before the block entity gets wiped
-        if (!world.isClient) {
-            for (BlockPos offset : OFFSETS) {
-                BlockPos phantomPos = pos.add(offset);
-                if (world.getBlockState(phantomPos).getBlock() instanceof UziHugePhantomBlock) {
-                    world.removeBlock(phantomPos, false);
-                }
-            }
-        }
-        return super.onBreak(world, pos, state, player);
-    }
-
 
     private static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
             Map.entry(ModSounds.UZI_NOISE,   80),
@@ -141,17 +79,83 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
-                                 PlayerEntity player, BlockHitResult hit) {
-        onShelfInteract(world, pos, 0, player);
-        return ActionResult.SUCCESS;
+    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+        for (BlockPos offset : OFFSETS) {
+            BlockState existing = world.getBlockState(pos.add(offset));
+            if (!existing.isAir() && !existing.isReplaceable()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state,
+                         LivingEntity placer, ItemStack stack) {
+        System.out.println("[UziHuge] onPlaced called, isClient=" + world.isClient);
+        if (world.isClient) return;
+
+        System.out.println("[UziHuge] phantom block is: " + ModBlocks.UZI_HUGE_PHANTOM);
+
+        for (BlockPos offset : OFFSETS) {
+            BlockPos phantomPos = pos.add(offset);
+
+            boolean placed = world.setBlockState(phantomPos,
+                    ModBlocks.UZI_HUGE_PHANTOM.getDefaultState(),
+                    Block.NOTIFY_ALL);
+
+            System.out.println("[UziHuge] placing phantom at " + phantomPos + " -> success=" + placed);
+
+            if (!placed) {
+                System.out.println("[UziHuge] ROLLBACK triggered at " + phantomPos);
+                for (BlockPos rollback : OFFSETS) {
+                    BlockPos rbPos = pos.add(rollback);
+                    if (world.getBlockState(rbPos).getBlock() instanceof UziHugePhantomBlock) {
+                        world.removeBlock(rbPos, false);
+                    }
+                }
+                world.removeBlock(pos, false);
+                return;
+            }
+        }
+        System.out.println("[UziHuge] All phantoms placed successfully!");
+    }
+
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!world.isClient) {
+            for (BlockPos offset : OFFSETS) {
+                BlockPos phantomPos = pos.add(offset);
+                if (world.getBlockState(phantomPos).getBlock() instanceof UziHugePhantomBlock) {
+                    world.removeBlock(phantomPos, false);
+                }
+            }
+        }
+        return super.onBreak(world, pos, state, player);
+    }
+
+    // ── Sound ─────────────────────────────────────────────────────────────────
+
+    // Called when the origin block itself is clicked
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
+                                 PlayerEntity player, BlockHitResult hit) {
+        playFromPos(world, pos, pos, player);
+        return ActionResult.SUCCESS;
+    }
+
+    // Called by PlushieSoundProvider — keeps shelf and other code working unchanged
+    @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
+        playFromPos(world, shelfPos, shelfPos, player);
+    }
+
+    // Called by UziHugePhantomBlock — passes the clicked phantom pos so SPP
+    // raycasts from the player to the exact block they touched, no muffling
+    public void playFromPos(World world, BlockPos shelfPos, BlockPos soundPos, PlayerEntity player) {
         if (!world.isClient) {
             long currentTime = world.getTime();
-            BlockPos key = shelfPos.add(slot, 0, 0);
+            BlockPos key = shelfPos.add(0, 0, 0);
             long cooldownEnd = SOUND_COOLDOWNS.getOrDefault(key, 0L);
             if (currentTime < cooldownEnd) return;
 
@@ -160,7 +164,7 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
             soundIndex = (soundIndex + 1) % SOUNDS.size();
 
             SOUND_COOLDOWNS.put(key, currentTime + SOUND_DURATIONS.get(sound));
-            world.playSound(null, shelfPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            world.playSound(null, soundPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
 
         if (world.isClient && world.getBlockEntity(shelfPos) instanceof UziHugeBlockEntity be) {

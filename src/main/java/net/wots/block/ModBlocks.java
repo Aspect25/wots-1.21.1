@@ -57,7 +57,7 @@ public class ModBlocks {
 
     public static final UziHugePhantomBlock UZI_HUGE_PHANTOM = registerBlock("uzi_huge_phantom",
             new UziHugePhantomBlock(AbstractBlock.Settings.create()
-                    .noCollision()
+                    .nonOpaque()
                     .noBlockBreakParticles()
                     .strength(0.1f)
                     .sounds(ModSounds.PLUSH_SOUND_GROUP)));

@@ -16,7 +16,6 @@ import java.util.Set;
 
 public class UziHugePhantomBlock extends Block {
 
-    // Tracks origins currently being broken to prevent duplicate processing
     private static final Set<BlockPos> BREAKING = new HashSet<>();
 
     public UziHugePhantomBlock(Settings settings) {
@@ -50,12 +49,27 @@ public class UziHugePhantomBlock extends Block {
                     world.removeBlock(origin, false);
 
                 } finally {
-                    // Always clean up even if something throws
                     BREAKING.remove(origin);
                 }
             }
         }
         return super.onBreak(world, pos, state, player);
+    }
+
+    // Delegates to UziHugeBlock.playFromPos, passing the clicked phantom pos
+    // so SPP raycasts to exactly where the player clicked — no muffling
+    @Override
+    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
+                                 PlayerEntity player, BlockHitResult hit) {
+        BlockPos origin = findOrigin(world, pos);
+        if (origin != null) {
+            BlockState originState = world.getBlockState(origin);
+            if (originState.getBlock() instanceof UziHugeBlock uziHuge) {
+                uziHuge.playFromPos(world, origin, pos, player);
+                return ActionResult.SUCCESS;
+            }
+        }
+        return ActionResult.PASS;
     }
 
     private BlockPos findOrigin(World world, BlockPos phantomPos) {
@@ -67,20 +81,6 @@ public class UziHugePhantomBlock extends Block {
                         return candidate;
                 }
         return null;
-    }
-    @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
-                                 PlayerEntity player, BlockHitResult hit) {
-        BlockPos origin = findOrigin(world, pos);
-        if (origin != null) {
-            // Delegate to the origin block's interaction logic
-            BlockState originState = world.getBlockState(origin);
-            if (originState.getBlock() instanceof UziHugeBlock uziHuge) {
-                uziHuge.onShelfInteract(world, origin, 0, player);
-                return ActionResult.SUCCESS;
-            }
-        }
-        return ActionResult.PASS;
     }
 
     @Override
