@@ -5,8 +5,12 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
@@ -94,12 +98,43 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
         return SHAPE;
     }
 
+
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof NPlushBlockEntity be) {
             be.stopSound();
+            if (!world.isClient) {
+                ItemStack stack = new ItemStack(state.getBlock().asItem());
+                NbtCompound nbt = new NbtCompound();
+                nbt.putString("id", "wots:n_plush"); // ← required
+                nbt.putString("Variant", be.getVariant().name());
+                nbt.putBoolean("LazyMode", be.isLazyMode());
+                stack.set(DataComponentTypes.BLOCK_ENTITY_DATA,
+                        net.minecraft.component.type.NbtComponent.of(nbt));
+                Block.dropStack(world, pos, stack);
+            }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override // ← was missing
+    public void onPlaced(World world, BlockPos pos, BlockState state,
+                         LivingEntity placer, ItemStack stack) {
+        super.onPlaced(world, pos, state, placer, stack);
+        if (world.isClient) return;
+        if (!(world.getBlockEntity(pos) instanceof NPlushBlockEntity be)) return;
+
+        var beData = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        if (beData == null) return;
+
+        NbtCompound nbt = beData.copyNbt();
+        if (nbt.contains("Variant")) {
+            try { be.setVariant(NPlushVariant.valueOf(nbt.getString("Variant"))); }
+            catch (IllegalArgumentException ignored) {}
+        }
+        if (nbt.contains("LazyMode")) {
+            be.setLazyMode(nbt.getBoolean("LazyMode"));
+        }
     }
 
     @Override

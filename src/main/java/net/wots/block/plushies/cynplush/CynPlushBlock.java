@@ -3,8 +3,10 @@ package net.wots.block.plushies.cynplush;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
@@ -23,7 +25,6 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
-    // ── VoxelShapes ───────────────────────────────────────────────────────────
     private static final VoxelShape SHAPE_NORTH = makeShape();
     private static final VoxelShape SHAPE_SOUTH = rotateShape(SHAPE_NORTH, 2);
     private static final VoxelShape SHAPE_EAST  = rotateShape(SHAPE_NORTH, 1);
@@ -34,12 +35,8 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
             double x1 = minX, z1 = minZ, x2 = maxX, z2 = maxZ;
             for (int i = 0; i < times; i++) {
-                double newX1 = 1 - z2;
-                double newZ1 = x1;
-                double newX2 = 1 - z1;
-                double newZ2 = x2;
-                x1 = newX1; z1 = newZ1;
-                x2 = newX2; z2 = newZ2;
+                double newX1 = 1 - z2, newZ1 = x1, newX2 = 1 - z1, newZ2 = x2;
+                x1 = newX1; z1 = newZ1; x2 = newX2; z2 = newZ2;
             }
             buffer[0] = VoxelShapes.combine(buffer[0],
                     VoxelShapes.cuboid(x1, minY, z1, x2, maxY, z2),
@@ -52,7 +49,6 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
     }
 
-    // ── Constructor ───────────────────────────────────────────────────────────
     public CynPlushBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
@@ -83,7 +79,6 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return new CynPlushBlockEntity(pos, state);
     }
 
-    // ── Shapes ────────────────────────────────────────────────────────────────
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
         return switch (state.get(FACING)) {
@@ -99,16 +94,23 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return getOutlineShape(state, world, pos, ctx);
     }
 
-    // ── Stop sound on break ───────────────────────────────────────────────────
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof CynPlushBlockEntity blockEntity) {
-            blockEntity.stopSound();
+        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof CynPlushBlockEntity be) {
+            be.stopSound(); // ← before super
+            if (!world.isClient) {
+                Block.dropStack(world, pos, new ItemStack(state.getBlock().asItem()));
+            }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    // ── Interaction ───────────────────────────────────────────────────────────
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state,
+                         LivingEntity placer, ItemStack stack) {
+        super.onPlaced(world, pos, state, placer, stack);
+    }
+
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos,
                                  PlayerEntity player, BlockHitResult hit) {
@@ -118,12 +120,11 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity blockEntity) {
-            blockEntity.playNextSound();
+        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
+            be.playNextSound();
         }
-
-        if (world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity blockEntity) {
-            blockEntity.triggerAnim("controller", "bounce");
+        if (world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
+            be.triggerAnim("controller", "bounce");
         }
     }
 }

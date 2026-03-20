@@ -5,8 +5,13 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
@@ -73,6 +78,7 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
+
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return createCodec(UziPlushBlock::new);
@@ -125,8 +131,36 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof UziPlushBlockEntity be) {
             be.stopSound();
+            if (!world.isClient) {
+                ItemStack stack = new ItemStack(state.getBlock().asItem());
+                NbtCompound nbt = new NbtCompound();
+                nbt.putString("id", "wots:uzi_plush");
+                nbt.putString("Variant", be.getVariant().name());
+                nbt.putBoolean("LazyMode", be.isLazyMode());
+                stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(nbt));
+                Block.dropStack(world, pos, stack);
+            }
         }
         super.onStateReplaced(state, world, pos, newState, moved);
+    }
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state,
+                         LivingEntity placer, ItemStack stack) {
+        super.onPlaced(world, pos, state, placer, stack);
+        if (world.isClient) return;
+        if (!(world.getBlockEntity(pos) instanceof UziPlushBlockEntity be)) return;
+
+        var beData = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        if (beData == null) return;
+
+        NbtCompound nbt = beData.copyNbt();
+        if (nbt.contains("Variant")) {
+            try { be.setVariant(UziPlushVariant.valueOf(nbt.getString("Variant"))); }
+            catch (IllegalArgumentException ignored) {}
+        }
+        if (nbt.contains("LazyMode")) {
+            be.setLazyMode(nbt.getBoolean("LazyMode"));
+        }
     }
 
     @Override

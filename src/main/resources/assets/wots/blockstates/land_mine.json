@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "wots:block/land_mine",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "wots:block/land_mine"
+    },
+    "facing=south": {
+      "model": "wots:block/land_mine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wots:block/land_mine",
+      "y": 270
+    }
+  }
+}

@@ -21,6 +21,13 @@ public class ModSounds {
     public static final SoundEvent CYN_NOISE_4 = registerSoundEvent("cyn_noise_4");
     public static final SoundEvent CYN_NOISE_5 = registerSoundEvent("cyn_noise_5");
     public static final SoundEvent CYN_NOISE_6 = registerSoundEvent("cyn_noise_6");
+    public static final SoundEvent CYN_NOISE_7 = registerSoundEvent("cyn_noise_7");
+    public static final SoundEvent CYN_NOISE_8 = registerSoundEvent("cyn_noise_8");
+    public static final SoundEvent CYN_NOISE_9 = registerSoundEvent("cyn_noise_9");
+    public static final SoundEvent CYN_NOISE_10 = registerSoundEvent("cyn_noise_10");
+    public static final SoundEvent CYN_NOISE_11 = registerSoundEvent("cyn_noise_11");
+
+
     public static final SoundEvent FATASS_NOISE = registerSoundEvent("fatass_noise");
     public static final SoundEvent UZI_NOISE = registerSoundEvent("uzi_noise");
     public static final SoundEvent N_NOISE_1 = registerSoundEvent("n_noise_1");
@@ -110,6 +117,14 @@ public class ModSounds {
             PLUSH_BREAK,
             PLUSH_STEP,
             PLUSH_PLACE,
+            PLUSH_HIT,
+            PLUSH_FALL
+    );
+    public static final BlockSoundGroup CYN_SOUND_GROUP = new BlockSoundGroup(
+            1.0f, 1.0f,
+            CYN_NOISE_11,
+            PLUSH_STEP,
+            CYN_NOISE_9,
             PLUSH_HIT,
             PLUSH_FALL
     );

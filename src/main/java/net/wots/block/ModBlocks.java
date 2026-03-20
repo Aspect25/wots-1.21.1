@@ -4,6 +4,8 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -20,7 +22,10 @@ import net.wots.block.plushies.the_duckler.TheDucklerPlush;
 import net.wots.block.plushies.uziplush.UziHugeBlock;
 import net.wots.block.plushies.uziplush.UziHugePhantomBlock;
 import net.wots.block.plushies.uziplush.UziPlushBlock;
+import net.wots.item.CynPlushBlockItem;
+import net.wots.item.NPlushBlockItem;
 import net.wots.item.TrashBlockItem;
+import net.wots.item.UziPlushBlockItem;
 import net.wots.sound.ModSounds;
 
 public class ModBlocks {
@@ -100,6 +105,8 @@ public class ModBlocks {
             )
     );
 
+    public static final Block LAND_MINE = registerBlock("land_mine",
+            new LandMineBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.5f).sounds(BlockSoundGroup.STONE)));
 
 
 
@@ -142,10 +149,18 @@ public class ModBlocks {
         return Registry.register(Registries.BLOCK, Identifier.of(Wots.MOD_ID, name), block);
     }
     private static void registerBlockItem(String name, Block block) {
-        BlockItem item = (block instanceof TrashBlock)
-                ? new TrashBlockItem(block, new Item.Settings())
-                : new BlockItem(block, new Item.Settings());
-
+        BlockItem item;
+        if (block instanceof TrashBlock) {
+            item = new TrashBlockItem(block, new Item.Settings());
+        } else if (block instanceof UziPlushBlock) {
+            item = new UziPlushBlockItem(block, new Item.Settings());
+        } else if (block instanceof NPlushBlock) {
+            item = new NPlushBlockItem(block, new Item.Settings());
+        } else if (block instanceof CynPlushBlock) {
+            item = new CynPlushBlockItem(block, new Item.Settings());
+        } else {
+            item = new BlockItem(block, new Item.Settings());
+        }
         Registry.register(Registries.ITEM, Identifier.of(Wots.MOD_ID, name), item);
     }
     private static <T extends Block> T registerBlock(String name, T block, BlockItem blockItem) {
@@ -157,6 +172,7 @@ public class ModBlocks {
         Wots.LOGGER.info("Registering Mod Blocks for " + Wots.MOD_ID);
         FuelRegistry.INSTANCE.add(UZI_PLUSH.asItem(), 100);
         FuelRegistry.INSTANCE.add(N_PLUSH.asItem(),   100);
+        FuelRegistry.INSTANCE.add(CYN_PLUSH.asItem(), 100);
 
     }
 }

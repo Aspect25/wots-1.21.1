@@ -27,6 +27,26 @@
     "subtitle": "sound.wots.cyn_noise_6",
     "sounds": ["wots:cyn_noise_6"]
   },
+  "cyn_noise_7": {
+    "subtitle": "sound.wots.cyn_noise_7",
+    "sounds": ["wots:cyn_noise_7"]
+  },
+  "cyn_noise_8": {
+    "subtitle": "sound.wots.cyn_noise_8",
+    "sounds": ["wots:cyn_noise_8"]
+  },
+  "cyn_noise_9": {
+    "subtitle": "sound.wots.cyn_noise_9",
+    "sounds": ["wots:cyn_noise_9"]
+  },
+  "cyn_noise_10": {
+    "subtitle": "sound.wots.cyn_noise_10",
+    "sounds": ["wots:cyn_noise_10"]
+  },
+  "cyn_noise_11": {
+    "subtitle": "sound.wots.cyn_noise_11",
+    "sounds": ["wots:cyn_noise_11"]
+  },
   "fatass_noise": {
     "subtitle": "sound.wots.fatass_noise",
     "sounds": ["wots:fatass_noise"]

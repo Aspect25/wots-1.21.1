@@ -13,7 +13,6 @@ import net.wots.block.ModBlocks;
 import net.wots.sound.ModSounds;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -23,14 +22,16 @@ public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    // ── Per-instance shuffle state ────────────────────────────────────────────
-    private static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
-            Map.entry(ModSounds.CYN_NOISE_1, 20),
-            Map.entry(ModSounds.CYN_NOISE_2, 60),
-            Map.entry(ModSounds.CYN_NOISE_3, 120),
-            Map.entry(ModSounds.CYN_NOISE_4, 100),
-            Map.entry(ModSounds.CYN_NOISE_5, 100),
-            Map.entry(ModSounds.CYN_NOISE_6, 60)
+    public static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
+            Map.entry(ModSounds.CYN_NOISE_1,  40),
+            Map.entry(ModSounds.CYN_NOISE_2,  20),
+            Map.entry(ModSounds.CYN_NOISE_3,  80),
+            Map.entry(ModSounds.CYN_NOISE_4,  80),
+            Map.entry(ModSounds.CYN_NOISE_5,  80),
+            Map.entry(ModSounds.CYN_NOISE_6,  20),
+            Map.entry(ModSounds.CYN_NOISE_7,  60),
+            Map.entry(ModSounds.CYN_NOISE_8,  60),
+            Map.entry(ModSounds.CYN_NOISE_10, 60)
     );
 
     private final List<SoundEvent> sounds;
@@ -45,10 +46,8 @@ public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
         Collections.shuffle(sounds);
     }
 
-    // ── Sound playback ────────────────────────────────────────────────────────
     public void playNextSound() {
         if (world == null || world.isClient) return;
-
         long currentTime = world.getTime();
         if (currentTime < cooldownEnd) return;
 
@@ -70,17 +69,14 @@ public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     public void stopSound() {
         if (world == null || world.isClient || currentSound == null) return;
-
         StopSoundS2CPacket packet = new StopSoundS2CPacket(currentSound.getId(), SoundCategory.BLOCKS);
         ((ServerWorld) world).getPlayers(
                 player -> player.squaredDistanceTo(Vec3d.ofCenter(pos)) < 64 * 64
         ).forEach(player -> ((ServerPlayerEntity) player).networkHandler.sendPacket(packet));
-
         currentSound = null;
         cooldownEnd = 0L;
     }
 
-    // ── GeckoLib ──────────────────────────────────────────────────────────────
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(
