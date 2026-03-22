@@ -3,7 +3,9 @@
 	"package": "net.wots.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"PlushieVoidMixin",
+		"ExplosionPlushieMixin"
+
 	],
 	"injectors": {
 		"defaultRequire": 1

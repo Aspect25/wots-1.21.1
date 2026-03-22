@@ -64,7 +64,7 @@ public class TrashBlockEntity extends BlockEntity implements Inventory {
         }
 
         entity.progress++;
-        if (entity.progress >= 2) { // 1 item per second (20 ticks)
+        if (entity.progress >= 20) { // 1 item per second (20 ticks)
             entity.progress = 0;
             ItemStack currentStack = entity.inventory.get(0);
             

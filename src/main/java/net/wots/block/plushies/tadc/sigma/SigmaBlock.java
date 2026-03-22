@@ -10,7 +10,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -19,11 +18,12 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.wots.block.entity.SigmaBlockEntity;
-import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
 import net.wots.sound.ModSounds;
 
 import java.util.*;
+import net.wots.util.ShuffledSoundQueue;
+import net.wots.util.VoxelShapeHelper;
 
 public class SigmaBlock extends BlockWithEntity implements PlushieSoundProvider {
 
@@ -36,35 +36,14 @@ public class SigmaBlock extends BlockWithEntity implements PlushieSoundProvider 
             Map.entry(ModSounds.UZI_NOISE_6, 60)
     );
 
-    private static final List<SoundEvent> SOUNDS = new ArrayList<>(SOUND_DURATIONS_UZI.keySet());
-    private static final Map<BlockPos, Long> SOUND_COOLDOWNS = new HashMap<>();
-    private static int soundIndex = 0;
+    private static final ShuffledSoundQueue SOUND_QUEUE = new ShuffledSoundQueue(SOUND_DURATIONS_UZI);
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
     // ── VoxelShapes ───────────────────────────────────────────────────────────
     private static final VoxelShape SHAPE_NORTH = makeShape();
-    private static final VoxelShape SHAPE_SOUTH = rotateShape(SHAPE_NORTH, 2);
-    private static final VoxelShape SHAPE_EAST  = rotateShape(SHAPE_NORTH, 1);
-    private static final VoxelShape SHAPE_WEST  = rotateShape(SHAPE_NORTH, 3);
-
-    private static VoxelShape rotateShape(VoxelShape shape, int times) {
-        VoxelShape[] buffer = {VoxelShapes.empty()};
-        shape.forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> {
-            double x1 = minX, z1 = minZ, x2 = maxX, z2 = maxZ;
-            for (int i = 0; i < times; i++) {
-                double newX1 = 1 - z2;
-                double newZ1 = x1;
-                double newX2 = 1 - z1;
-                double newZ2 = x2;
-                x1 = newX1; z1 = newZ1;
-                x2 = newX2; z2 = newZ2;
-            }
-            buffer[0] = VoxelShapes.combine(buffer[0],
-                    VoxelShapes.cuboid(x1, minY, z1, x2, maxY, z2),
-                    BooleanBiFunction.OR);
-        });
-        return buffer[0];
-    }
+    private static final VoxelShape SHAPE_SOUTH = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 2);
+    private static final VoxelShape SHAPE_EAST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 1);
+    private static final VoxelShape SHAPE_WEST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 3);
 
     private static VoxelShape makeShape() {
         return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
@@ -128,22 +107,9 @@ public class SigmaBlock extends BlockWithEntity implements PlushieSoundProvider 
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
         if (!world.isClient) {
-            long currentTime = world.getTime();
-            BlockPos key = shelfPos.add(slot, 0, 0);
-            long cooldownEnd = SOUND_COOLDOWNS.getOrDefault(key, 0L);
-
-            if (currentTime < cooldownEnd) return;
-
-            if (soundIndex == 0) Collections.shuffle(SOUNDS);
-
-            SoundEvent randomSound = SOUNDS.get(soundIndex);
-            soundIndex = (soundIndex + 1) % SOUNDS.size();
-
-            SOUND_COOLDOWNS.put(key, currentTime + SOUND_DURATIONS_UZI.get(randomSound));
-            world.playSound(null, shelfPos, randomSound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            SoundEvent sound = SOUND_QUEUE.tryAdvance(world.getTime());
+            if (sound != null) world.playSound(null, shelfPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
-
-        // Trigger the animation client-side only
         if (world.isClient && world.getBlockEntity(shelfPos) instanceof SigmaBlockEntity blockEntity) {
             blockEntity.triggerAnim("controller", "bounce");
         }

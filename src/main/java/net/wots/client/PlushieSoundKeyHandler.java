@@ -25,12 +25,12 @@ public class PlushieSoundKeyHandler {
             if (client.player == null) return;
 
             if (ModKeybindings.PLUSHIE_HAT_SOUND_KEY.wasPressed()) {
-                LOGGER.info("[WOTS] Hat keybind pressed — sending packet");
+                LOGGER.debug("[WOTS] Hat keybind pressed — sending packet");
                 ClientPlayNetworking.send(new PlushieSoundPayloads.HatPayload());
             }
 
             if (ModKeybindings.PLUSHIE_BACK_SOUND_KEY.wasPressed()) {
-                LOGGER.info("[WOTS] Back keybind pressed — sending packet");
+                LOGGER.debug("[WOTS] Back keybind pressed — sending packet");
                 ClientPlayNetworking.send(new PlushieSoundPayloads.BackPayload());
             }
         });
@@ -42,7 +42,7 @@ public class PlushieSoundKeyHandler {
         ServerPlayNetworking.registerGlobalReceiver(
                 PlushieSoundPayloads.HatPayload.ID,
                 (payload, context) -> context.server().execute(() -> {
-                    LOGGER.info("[WOTS] Hat packet received for player: {}", context.player().getName().getString());
+                    LOGGER.debug("[WOTS] Hat packet received for player: {}", context.player().getName().getString());
                     tryPlayForSlot(context.player(), SLOT_HAT);
                 })
         );
@@ -50,7 +50,7 @@ public class PlushieSoundKeyHandler {
         ServerPlayNetworking.registerGlobalReceiver(
                 PlushieSoundPayloads.BackPayload.ID,
                 (payload, context) -> context.server().execute(() -> {
-                    LOGGER.info("[WOTS] Back packet received for player: {}", context.player().getName().getString());
+                    LOGGER.debug("[WOTS] Back packet received for player: {}", context.player().getName().getString());
                     tryPlayForSlot(context.player(), SLOT_BACK);
                 })
         );
@@ -66,7 +66,7 @@ public class PlushieSoundKeyHandler {
         }
 
         // Log ALL available slot names so we can see what Accessories actually registered
-        LOGGER.info("[WOTS] Available slots: {}", capability.getContainers().keySet());
+        LOGGER.debug("[WOTS] Available slots: {}", capability.getContainers().keySet());
 
         var container = capability.getContainers().get(slotName);
         if (container == null) {
@@ -75,11 +75,11 @@ public class PlushieSoundKeyHandler {
         }
 
         var accessories = container.getAccessories();
-        LOGGER.info("[WOTS] Slot '{}' has {} stacks", slotName, accessories.size());
+        LOGGER.debug("[WOTS] Slot '{}' has {} stacks", slotName, accessories.size());
 
         for (int i = 0; i < accessories.size(); i++) {
             ItemStack stack = accessories.getStack(i);
-            LOGGER.info("[WOTS]   Stack {}: {} (implements PlushieSoundAccessory: {})",
+            LOGGER.debug("[WOTS]   Stack {}: {} (implements PlushieSoundAccessory: {})",
                     i,
                     stack.isEmpty() ? "EMPTY" : stack.getItem().getClass().getSimpleName(),
                     stack.isEmpty() ? "n/a" : (stack.getItem() instanceof PlushieSoundAccessory)
@@ -87,7 +87,7 @@ public class PlushieSoundKeyHandler {
             if (stack.isEmpty()) continue;
 
             if (stack.getItem() instanceof PlushieSoundAccessory soundItem) {
-                LOGGER.info("[WOTS] Playing sound for slot '{}'", slotName);
+                LOGGER.debug("[WOTS] Playing sound for slot '{}'", slotName);
                 soundItem.playNextPlushieSound(player);
                 return;
             }

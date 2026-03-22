@@ -2,6 +2,7 @@ package net.wots;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -11,6 +12,7 @@ import net.wots.item.ModItemGroups;
 import net.wots.network.*;
 import net.wots.screen.CustomStonecutterScreenHandler;
 import net.wots.recipe.CustomStonecuttingRecipe;
+import net.wots.unlock.UnlockSyncHelper;
 import net.minecraft.block.Block;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
@@ -41,6 +43,8 @@ public class Wots implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		net.wots.sound.ModSounds.registerModSounds();
+		net.wots.item.ModItems.registerModItems();
 		ModBlocks.registerModBlock();
 		ModItemGroups.registerItemGroups();
 
@@ -48,7 +52,13 @@ public class Wots implements ModInitializer {
 		SetUziVariantPayload.registerServer();
 		SetNVariantPayload.registerServer();
 
-		// ── Attachments ───────────────────────────────────────────────────────
+		// ── Variant unlock system ─────────────────────────────────────────────
+		SyncVariantUnlocksPayload.register();
+		VariantChangeParticlePayload.register();
+
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			UnlockSyncHelper.onPlayerJoin(handler.getPlayer());
+		});
 
 		// ── Screen handlers ───────────────────────────────────────────────────
 

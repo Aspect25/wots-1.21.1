@@ -6,10 +6,13 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.uziplush.UziPlushVariant;
+import net.wots.unlock.VariantUnlockData;
 
 public record SetUziVariantPayload(BlockPos pos, String variantName, boolean lazyMode)
         implements CustomPayload {
@@ -33,18 +36,41 @@ public record SetUziVariantPayload(BlockPos pos, String variantName, boolean laz
 
         ServerPlayNetworking.registerGlobalReceiver(ID, (payload, ctx) ->
                 ctx.server().execute(() -> {
-                    var world = ctx.player().getServerWorld();
+                    ServerPlayerEntity player = ctx.player();
+                    var world = player.getServerWorld();
                     if (world.getBlockEntity(payload.pos()) instanceof UziPlushBlockEntity be) {
                         if (payload.lazyMode()) {
                             be.setLazyMode(true);
                         } else {
                             be.setLazyMode(false);
                             try {
-                                be.setVariant(UziPlushVariant.valueOf(payload.variantName()));
+                                UziPlushVariant variant = UziPlushVariant.valueOf(payload.variantName());
+
+                                // ── Unlock check ──────────────────────────────
+                                VariantUnlockData data = VariantUnlockData.get(ctx.server());
+                                if (!data.isUnlocked(player.getUuid(), variant.name())) {
+                                    return; // Variant is locked — ignore the request
+                                }
+
+                                UziPlushVariant oldVariant = be.getVariant();
+                                be.setVariant(variant);
+
+                                // ── Particle effect on variant change ─────────
+                                if (oldVariant != variant) {
+                                    sendVariantChangeParticles(world, payload.pos(), variant.color);
+                                }
                             } catch (IllegalArgumentException ignored) {}
                         }
                     }
                 })
         );
+    }
+
+    private static void sendVariantChangeParticles(ServerWorld world, BlockPos pos, int color) {
+        VariantChangeParticlePayload particlePayload = new VariantChangeParticlePayload(pos, color);
+        for (ServerPlayerEntity nearby : world.getPlayers(
+                p -> p.squaredDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 64 * 64)) {
+            ServerPlayNetworking.send(nearby, particlePayload);
+        }
     }
 }

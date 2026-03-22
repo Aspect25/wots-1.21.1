@@ -3,9 +3,7 @@ package net.wots.client.renderer;
 
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.wots.block.entity.CynPlushBlockEntity;
-import net.wots.block.entity.NPlushBlockEntity;
 import net.wots.block.plushies.cynplush.CynPlushModel;
-import net.wots.block.plushies.nplush.NPlushModel;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
 public class CynPlushBlockEntityRenderer extends GeoBlockRenderer<CynPlushBlockEntity> {

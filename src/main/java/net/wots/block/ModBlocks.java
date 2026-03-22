@@ -45,7 +45,7 @@ public class ModBlocks {
 
 
     public static final Block N_PLUSH = registerBlock("n_plush",
-            new NPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.1f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
+            new NPlushBlock(AbstractBlock.Settings.create().nonOpaque().strength(0.3f).sounds(ModSounds.PLUSH_SOUND_GROUP)));
     public static final BlockEntityType<NPlushBlockEntity> N_PLUSH_BLOCK_ENTITY =
             Registry.register(
                     Registries.BLOCK_ENTITY_TYPE,

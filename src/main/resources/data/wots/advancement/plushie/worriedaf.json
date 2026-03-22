@@ -1,0 +1,10 @@
+{
+    "parent": "wots:plushie/root",
+    "display": {
+        "icon": { "id": "wots:n_plush" },
+        "title": { "text": "Storm Warning" },
+        "description": { "text": "Thunder makes everyone nervous. Even the small ones." },
+        "frame": "task", "show_toast": true, "announce_to_chat": false
+    },
+    "criteria": { "unlock": { "trigger": "minecraft:impossible" } }
+}

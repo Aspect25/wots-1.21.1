@@ -17,6 +17,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
+import net.wots.util.ShuffledSoundQueue;
 
 public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
@@ -34,47 +35,28 @@ public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
             Map.entry(ModSounds.CYN_NOISE_10, 60)
     );
 
-    private final List<SoundEvent> sounds;
-    private int soundIndex = 0;
-    private SoundEvent lastPlayed = null;
-    private SoundEvent currentSound = null;
-    private long cooldownEnd = 0L;
+    private final ShuffledSoundQueue soundQueue;
 
     public CynPlushBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.CYN_PLUSH_BLOCK_ENTITY, pos, state);
-        sounds = new ArrayList<>(SOUND_DURATIONS.keySet());
-        Collections.shuffle(sounds);
+        soundQueue = new ShuffledSoundQueue(SOUND_DURATIONS);
     }
 
     public void playNextSound() {
         if (world == null || world.isClient) return;
-        long currentTime = world.getTime();
-        if (currentTime < cooldownEnd) return;
-
-        if (soundIndex == 0) {
-            Collections.shuffle(sounds);
-            if (sounds.size() > 1 && sounds.get(0).equals(lastPlayed)) {
-                Collections.swap(sounds, 0, 1);
-            }
-        }
-
-        SoundEvent sound = sounds.get(soundIndex);
-        lastPlayed = sound;
-        currentSound = sound;
-        soundIndex = (soundIndex + 1) % sounds.size();
-
-        cooldownEnd = currentTime + SOUND_DURATIONS.get(sound);
-        world.playSound(null, pos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        SoundEvent sound = soundQueue.tryAdvance(world.getTime());
+        if (sound != null) world.playSound(null, pos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     public void stopSound() {
-        if (world == null || world.isClient || currentSound == null) return;
-        StopSoundS2CPacket packet = new StopSoundS2CPacket(currentSound.getId(), SoundCategory.BLOCKS);
+        if (world == null || world.isClient) return;
+        SoundEvent current = soundQueue.getCurrentlyPlaying();
+        if (current == null) return;
+        StopSoundS2CPacket packet = new StopSoundS2CPacket(current.getId(), SoundCategory.BLOCKS);
         ((ServerWorld) world).getPlayers(
                 player -> player.squaredDistanceTo(Vec3d.ofCenter(pos)) < 64 * 64
         ).forEach(player -> ((ServerPlayerEntity) player).networkHandler.sendPacket(packet));
-        currentSound = null;
-        cooldownEnd = 0L;
+        soundQueue.clearCurrent();
     }
 
     @Override

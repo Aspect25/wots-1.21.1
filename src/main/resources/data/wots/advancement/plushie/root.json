@@ -1,0 +1,17 @@
+{
+    "display": {
+        "icon": { "id": "wots:n_plush" },
+        "title": { "text": "A New Friend", "color": "#FFD700" },
+        "description": { "text": "Place your first plushie. They have more personality than you think..." },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png"
+    },
+    "criteria": {
+        "place_n": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:n_plush" }] } },
+        "place_uzi": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:uzi_plush" }] } },
+        "place_cyn": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:cyn_plush" }] } }
+    },
+    "requirements": [["place_n", "place_uzi", "place_cyn"]]
+}

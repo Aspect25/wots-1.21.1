@@ -1,0 +1,10 @@
+{
+    "parent": "wots:plushie/root",
+    "display": {
+        "icon": { "id": "wots:n_plush" },
+        "title": { "text": "Shell Shocked" },
+        "description": { "text": "Some things can't be unseen. Especially explosions." },
+        "frame": "task", "show_toast": true, "announce_to_chat": false
+    },
+    "criteria": { "unlock": { "trigger": "minecraft:impossible" } }
+}

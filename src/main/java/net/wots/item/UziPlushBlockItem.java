@@ -17,21 +17,15 @@ import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.uziplush.UziPlushVariant;
 import net.wots.item.accessory.PlushieSoundAccessory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import net.wots.util.ShuffledSoundQueue;
 
 public class UziPlushBlockItem extends BlockItem implements PlushieSoundAccessory {
 
-    // ── Sound state ───────────────────────────────────────────────────────────
-    private final List<SoundEvent> sounds = new ArrayList<>(UziPlushBlockEntity.SOUND_DURATIONS.keySet());
-    private int        soundIndex  = 0;
-    private SoundEvent lastPlayed  = null;
-    private long       cooldownEnd = 0L;
+    private final ShuffledSoundQueue soundQueue = new ShuffledSoundQueue(UziPlushBlockEntity.SOUND_DURATIONS);
 
     public UziPlushBlockItem(Block block, Settings settings) {
         super(block, settings);
-        Collections.shuffle(sounds);
     }
 
     // ── PlushieSoundAccessory ─────────────────────────────────────────────────
@@ -39,38 +33,16 @@ public class UziPlushBlockItem extends BlockItem implements PlushieSoundAccessor
     @Override
     public void playNextPlushieSound(PlayerEntity player) {
         if (player.getWorld().isClient) return;
+        SoundEvent sound = soundQueue.tryAdvance(player.getWorld().getTime());
+        if (sound == null) return;
 
-        long now = player.getWorld().getTime();
-        if (now < cooldownEnd) return;
-
-        if (soundIndex == 0) {
-            Collections.shuffle(sounds);
-            if (sounds.size() > 1 && sounds.get(0).equals(lastPlayed)) {
-                Collections.swap(sounds, 0, 1);
-            }
-        }
-
-        SoundEvent sound = sounds.get(soundIndex);
-        lastPlayed  = sound;
-        soundIndex  = (soundIndex + 1) % sounds.size();
-        cooldownEnd = now + UziPlushBlockEntity.SOUND_DURATIONS.get(sound);
-
-        // Build a packet that attaches the sound to the entity so it follows
-        // the player as they move, instead of playing from a fixed block pos.
+        // Attach sound to entity so it follows the player as they move
         ServerWorld serverWorld = (ServerWorld) player.getWorld();
         PlaySoundFromEntityS2CPacket packet = new PlaySoundFromEntityS2CPacket(
-                Registries.SOUND_EVENT.getEntry(sound),
-                SoundCategory.PLAYERS,
-                player,
-                1.0f,                        // volume
-                1.0f,                        // pitch
-                serverWorld.random.nextLong() // seed
-        );
-
-        // Send to every player within 64 blocks (including the wearer)
-        serverWorld.getPlayers(p ->
-                p.squaredDistanceTo(player) <= 64 * 64
-        ).forEach(p -> ((ServerPlayerEntity) p).networkHandler.sendPacket(packet));
+                Registries.SOUND_EVENT.getEntry(sound), SoundCategory.PLAYERS,
+                player, 1.0f, 1.0f, serverWorld.random.nextLong());
+        serverWorld.getPlayers(p -> p.squaredDistanceTo(player) <= 64 * 64)
+                .forEach(p -> ((ServerPlayerEntity) p).networkHandler.sendPacket(packet));
     }
 
     // ── Display name ──────────────────────────────────────────────────────────

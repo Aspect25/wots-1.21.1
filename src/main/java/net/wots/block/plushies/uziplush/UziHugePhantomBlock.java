@@ -24,10 +24,10 @@ public class UziHugePhantomBlock extends Block {
 
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        System.out.println("[UziPhantom] onBreak called at " + pos + " isClient=" + world.isClient);
+        net.wots.Wots.LOGGER.debug("[UziPhantom] onBreak called at " + pos + " isClient=" + world.isClient);
         if (!world.isClient) {
             BlockPos origin = findOrigin(world, pos);
-            System.out.println("[UziPhantom] origin found: " + origin);
+            net.wots.Wots.LOGGER.debug("[UziPhantom] origin found: " + origin);
 
             if (origin != null && !BREAKING.contains(origin)) {
                 BREAKING.add(origin);

@@ -3,6 +3,7 @@ package net.wots;
 import io.wispforest.accessories.api.client.AccessoriesRendererRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
@@ -25,16 +26,28 @@ import net.wots.block.plushies.uziplush.UziPlushVariant;
 import net.wots.client.CustomStonecutterScreen;
 import net.wots.client.ModKeybindings;
 import net.wots.client.PlushieSoundKeyHandler;
+import net.wots.client.VariantChangeParticles;
 import net.wots.client.renderer.*;
+import net.wots.network.SyncVariantUnlocksPayload;
+import net.wots.network.VariantChangeParticlePayload;
+import net.wots.unlock.UnlockSyncHelper;
 
 public class WotsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // ── Variant unlock sync receiver ─────────────────────────────────────
+        ClientPlayNetworking.registerGlobalReceiver(SyncVariantUnlocksPayload.ID, (payload, context) -> {
+            UnlockSyncHelper.updateClientCache(payload.unlocks());
+        });
+
+        // ── Variant change particle receiver ─────────────────────────────────
+        ClientPlayNetworking.registerGlobalReceiver(VariantChangeParticlePayload.ID, (payload, context) -> {
+            VariantChangeParticles.spawnBurst(payload.pos(), payload.color());
+        });
 
 
         BlockEntityRendererRegistry.register(ModBlocks.PLUSHIE_SHELF_BLOCK_ENTITY, PlushieShelfBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(ModBlocks.TRASH_BLOCK_ENTITY, TrashBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.UZI_PLUSH_BLOCK_ENTITY, UziPlushBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.N_PLUSH_BLOCK_ENTITY, NPlushBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.UZI_HUGE_BLOCK_ENTITY, UziHugeBlockEntityRenderer::new);

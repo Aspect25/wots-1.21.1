@@ -11,6 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.state.StateManager;
@@ -27,28 +29,23 @@ import net.wots.block.ModBlocks;
 import net.wots.block.entity.NPlushBlockEntity;
 import net.wots.block.entity.PlushieShelfBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
+import net.wots.unlock.VariantUnlockManager;
 
 import java.util.*;
+import net.wots.util.ShuffledSoundQueue;
+import net.wots.util.VoxelShapeHelper;
 
 public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider {
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
-    private static final VoxelShape SHAPE = VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
-
-    // ── Per-shelf-slot sound state ────────────────────────────────────────────
-    // Keyed by (blockPos.asLong(), slot) so every shelf slot is independent.
-    // These maps live on the server; they are not persisted (sound resets on
-    // restart which is fine — the plushie just shuffles again from the beginning).
+    private static final VoxelShape SHAPE_NORTH = VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
+    private static final VoxelShape SHAPE_SOUTH = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 2);
+    private static final VoxelShape SHAPE_EAST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 1);
+    private static final VoxelShape SHAPE_WEST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 3);
 
     private record SlotKey(long pos, int slot) {}
-
-    private static final Map<SlotKey, Long>             SHELF_COOLDOWNS   = new HashMap<>();
-    private static final Map<SlotKey, Integer>          SHELF_SOUND_IDX   = new HashMap<>();
-    private static final Map<SlotKey, SoundEvent>       SHELF_LAST_PLAYED = new HashMap<>();
-    private static final Map<SlotKey, List<SoundEvent>> SHELF_SOUND_LISTS = new HashMap<>();
-
-    // ── Constructor ───────────────────────────────────────────────────────────
+    private static final Map<SlotKey, ShuffledSoundQueue> SHELF_QUEUES = new HashMap<>();
 
     public NPlushBlock(Settings settings) {
         super(settings);
@@ -90,23 +87,28 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return SHAPE;
+        return switch (state.get(FACING)) {
+            case SOUTH -> SHAPE_SOUTH;
+            case EAST  -> SHAPE_EAST;
+            case WEST  -> SHAPE_WEST;
+            default    -> SHAPE_NORTH;
+        };
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return SHAPE;
+        return getOutlineShape(state, world, pos, ctx);
     }
-
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof NPlushBlockEntity be) {
             be.stopSound();
+            VariantUnlockManager.clearHitCount(pos);
             if (!world.isClient) {
                 ItemStack stack = new ItemStack(state.getBlock().asItem());
                 NbtCompound nbt = new NbtCompound();
-                nbt.putString("id", "wots:n_plush"); // ← required
+                nbt.putString("id", "wots:n_plush");
                 nbt.putString("Variant", be.getVariant().name());
                 nbt.putBoolean("LazyMode", be.isLazyMode());
                 stack.set(DataComponentTypes.BLOCK_ENTITY_DATA,
@@ -117,7 +119,7 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
-    @Override // ← was missing
+    @Override
     public void onPlaced(World world, BlockPos pos, BlockState state,
                          LivingEntity placer, ItemStack stack) {
         super.onPlaced(world, pos, state, placer, stack);
@@ -125,21 +127,32 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
         if (!(world.getBlockEntity(pos) instanceof NPlushBlockEntity be)) return;
 
         var beData = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
-        if (beData == null) return;
-
-        NbtCompound nbt = beData.copyNbt();
-        if (nbt.contains("Variant")) {
-            try { be.setVariant(NPlushVariant.valueOf(nbt.getString("Variant"))); }
-            catch (IllegalArgumentException ignored) {}
+        if (beData != null) {
+            NbtCompound nbt = beData.copyNbt();
+            if (nbt.contains("Variant")) {
+                try { be.setVariant(NPlushVariant.valueOf(nbt.getString("Variant"))); }
+                catch (IllegalArgumentException ignored) {}
+            }
+            if (nbt.contains("LazyMode")) {
+                be.setLazyMode(nbt.getBoolean("LazyMode"));
+            }
         }
-        if (nbt.contains("LazyMode")) {
-            be.setLazyMode(nbt.getBoolean("LazyMode"));
+
+        // ── Unlock checks on placement ───────────────────────────────────
+        if (placer instanceof ServerPlayerEntity player) {
+            VariantUnlockManager.onPlushiePlaced((ServerWorld) world, pos, player, "n");
+            VariantUnlockManager.checkNeighborsForUziUnlocks((ServerWorld) world, pos, player);
         }
     }
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos,
                                  PlayerEntity player, BlockHitResult hit) {
+        // ── Drunk unlock check ───────────────────────────────────────────
+        if (!world.isClient && player instanceof ServerPlayerEntity sp) {
+            VariantUnlockManager.onPlushieUsed(sp, "n");
+        }
+
         if (player.isSneaking()) {
             if (world.isClient) {
                 net.minecraft.client.MinecraftClient.getInstance()
@@ -151,23 +164,21 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
         return ActionResult.SUCCESS;
     }
 
+    // ── Angyaf unlock — hit detection ─────────────────────────────────────
+    @Override
+    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        if (!world.isClient && player instanceof ServerPlayerEntity sp) {
+            VariantUnlockManager.onPlushieHit((ServerWorld) world, pos, sp, "n");
+        }
+        super.onBlockBreakStart(state, world, pos, player);
+    }
+
     // ── PlushieSoundProvider ──────────────────────────────────────────────────
 
-    /**
-     * Called both when this NPlush is placed as its own block (pos holds an
-     * NPlushBlockEntity) and when it sits on a shelf (pos holds a
-     * PlushieShelfBlockEntity). The two cases are handled separately:
-     *
-     *  • NPlushBlockEntity  → delegate to the BE's own sound/anim methods
-     *                         (existing behaviour, unchanged).
-     *  • PlushieShelfBlockEntity → play sound via per-slot static maps and ask
-     *                              the shelf BE to sync a bounce trigger to clients.
-     */
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
         var be = world.getBlockEntity(shelfPos);
 
-        // ── Case 1: NPlush placed as its own full block ───────────────────────
         if (be instanceof NPlushBlockEntity nbe) {
             if (!world.isClient) {
                 nbe.playNextSound();
@@ -178,44 +189,14 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
             return;
         }
 
-        // ── Case 2: NPlush sitting on a PlushieShelfBlock ─────────────────────
         if (be instanceof PlushieShelfBlockEntity shelf) {
-            if (world.isClient) return; // everything below runs server-side only
-
-            // Sound ────────────────────────────────────────────────────────────
+            if (world.isClient) return;
             SlotKey key = new SlotKey(shelfPos.asLong(), slot);
-            long now = world.getTime();
-
-            if (now < SHELF_COOLDOWNS.getOrDefault(key, 0L)) return;
-
-            // Each shelf slot keeps its own independently-shuffled sound list.
-            List<SoundEvent> sounds = SHELF_SOUND_LISTS.computeIfAbsent(key, k -> {
-                List<SoundEvent> list = new ArrayList<>(NPlushBlockEntity.SOUND_DURATIONS.keySet());
-                Collections.shuffle(list);
-                return list;
-            });
-
-            int idx = SHELF_SOUND_IDX.getOrDefault(key, 0);
-            if (idx == 0) {
-                Collections.shuffle(sounds);
-                // Avoid repeating the previous sound at the start of a new shuffle pass.
-                SoundEvent last = SHELF_LAST_PLAYED.get(key);
-                if (last != null && sounds.size() > 1 && sounds.get(0).equals(last)) {
-                    Collections.swap(sounds, 0, 1);
-                }
-            }
-
-            SoundEvent sound = sounds.get(idx);
-            SHELF_LAST_PLAYED.put(key, sound);
-            SHELF_SOUND_IDX.put(key, (idx + 1) % sounds.size());
-            SHELF_COOLDOWNS.put(key, now + NPlushBlockEntity.SOUND_DURATIONS.get(sound));
-
+            ShuffledSoundQueue queue = SHELF_QUEUES.computeIfAbsent(key,
+                    k -> new ShuffledSoundQueue(NPlushBlockEntity.SOUND_DURATIONS));
+            SoundEvent sound = queue.tryAdvance(world.getTime());
+            if (sound == null) return;
             world.playSound(null, shelfPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
-
-            // Animation ───────────────────────────────────────────────────────
-            // triggerBounce() sets bounceSlot and fires an update packet; the
-            // client reads it in PlushieShelfBlockEntity.readNbt() and calls
-            // triggerAnim("controller", "bounce") on the matching proxy BE.
             shelf.triggerBounce(slot);
         }
     }

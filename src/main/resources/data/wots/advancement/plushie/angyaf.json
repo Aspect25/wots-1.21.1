@@ -1,0 +1,10 @@
+{
+    "parent": "wots:plushie/root",
+    "display": {
+        "icon": { "id": "wots:uzi_plush" },
+        "title": { "text": "Don't. Poke. The. Bear." },
+        "description": { "text": "Hit something enough times and it hits back... emotionally." },
+        "frame": "task", "show_toast": true, "announce_to_chat": false
+    },
+    "criteria": { "unlock": { "trigger": "minecraft:impossible" } }
+}

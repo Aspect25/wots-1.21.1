@@ -4,6 +4,8 @@ import net.minecraft.util.Identifier;
 import net.wots.block.entity.NPlushBlockEntity;
 import software.bernie.geckolib.model.GeoModel;
 
+import java.util.Locale;
+
 public class NPlushModel extends GeoModel<NPlushBlockEntity> {
 
     @Override
@@ -13,7 +15,7 @@ public class NPlushModel extends GeoModel<NPlushBlockEntity> {
 
     @Override
     public Identifier getTextureResource(NPlushBlockEntity entity) {
-        String textureName = entity.getVariant().name().toLowerCase();
+        String textureName = entity.getVariant().name().toLowerCase(Locale.ROOT);
         return Identifier.of("wots", "textures/block/" + textureName + ".png");
     }
 

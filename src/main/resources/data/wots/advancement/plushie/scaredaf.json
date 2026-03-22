@@ -1,0 +1,10 @@
+{
+    "parent": "wots:plushie/spooked",
+    "display": {
+        "icon": { "id": "wots:uzi_plush" },
+        "title": { "text": "Wrong Dimension" },
+        "description": { "text": "Some places are too alien. Even for a plushie." },
+        "frame": "goal", "show_toast": true, "announce_to_chat": true
+    },
+    "criteria": { "unlock": { "trigger": "minecraft:impossible" } }
+}

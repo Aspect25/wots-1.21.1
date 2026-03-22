@@ -23,6 +23,7 @@ import net.wots.block.plushies.PlushieSoundProvider;
 import net.wots.sound.ModSounds;
 
 import java.util.*;
+import net.wots.util.ShuffledSoundQueue;
 
 public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvider {
     public static final List<BlockPos> OFFSETS = new ArrayList<>();
@@ -42,9 +43,7 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
             Map.entry(ModSounds.UZI_NOISE_5, 60),
             Map.entry(ModSounds.UZI_NOISE_6, 60)
     );
-    private static final List<SoundEvent> SOUNDS = new ArrayList<>(SOUND_DURATIONS.keySet());
-    private static final Map<BlockPos, Long> SOUND_COOLDOWNS = new HashMap<>();
-    private static int soundIndex = 0;
+    private static final ShuffledSoundQueue SOUND_QUEUE = new ShuffledSoundQueue(SOUND_DURATIONS);
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
@@ -92,10 +91,10 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state,
                          LivingEntity placer, ItemStack stack) {
-        System.out.println("[UziHuge] onPlaced called, isClient=" + world.isClient);
+        net.wots.Wots.LOGGER.debug("[UziHuge] onPlaced called, isClient=" + world.isClient);
         if (world.isClient) return;
 
-        System.out.println("[UziHuge] phantom block is: " + ModBlocks.UZI_HUGE_PHANTOM);
+        net.wots.Wots.LOGGER.debug("[UziHuge] phantom block is: " + ModBlocks.UZI_HUGE_PHANTOM);
 
         for (BlockPos offset : OFFSETS) {
             BlockPos phantomPos = pos.add(offset);
@@ -104,10 +103,10 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
                     ModBlocks.UZI_HUGE_PHANTOM.getDefaultState(),
                     Block.NOTIFY_ALL);
 
-            System.out.println("[UziHuge] placing phantom at " + phantomPos + " -> success=" + placed);
+            net.wots.Wots.LOGGER.debug("[UziHuge] placing phantom at " + phantomPos + " -> success=" + placed);
 
             if (!placed) {
-                System.out.println("[UziHuge] ROLLBACK triggered at " + phantomPos);
+                net.wots.Wots.LOGGER.debug("[UziHuge] ROLLBACK triggered at " + phantomPos);
                 for (BlockPos rollback : OFFSETS) {
                     BlockPos rbPos = pos.add(rollback);
                     if (world.getBlockState(rbPos).getBlock() instanceof UziHugePhantomBlock) {
@@ -118,7 +117,7 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
                 return;
             }
         }
-        System.out.println("[UziHuge] All phantoms placed successfully!");
+        net.wots.Wots.LOGGER.debug("[UziHuge] All phantoms placed successfully!");
     }
 
     @Override
@@ -154,17 +153,8 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
     // raycasts from the player to the exact block they touched, no muffling
     public void playFromPos(World world, BlockPos shelfPos, BlockPos soundPos, PlayerEntity player) {
         if (!world.isClient) {
-            long currentTime = world.getTime();
-            BlockPos key = shelfPos.add(0, 0, 0);
-            long cooldownEnd = SOUND_COOLDOWNS.getOrDefault(key, 0L);
-            if (currentTime < cooldownEnd) return;
-
-            if (soundIndex == 0) Collections.shuffle(SOUNDS);
-            SoundEvent sound = SOUNDS.get(soundIndex);
-            soundIndex = (soundIndex + 1) % SOUNDS.size();
-
-            SOUND_COOLDOWNS.put(key, currentTime + SOUND_DURATIONS.get(sound));
-            world.playSound(null, soundPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            SoundEvent sound = SOUND_QUEUE.tryAdvance(world.getTime());
+            if (sound != null) world.playSound(null, soundPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
         }
 
         if (world.isClient && world.getBlockEntity(shelfPos) instanceof UziHugeBlockEntity be) {
