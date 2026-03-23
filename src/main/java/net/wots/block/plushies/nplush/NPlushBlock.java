@@ -110,7 +110,6 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
                 NbtCompound nbt = new NbtCompound();
                 nbt.putString("id", "wots:n_plush");
                 nbt.putString("Variant", be.getVariant().name());
-                nbt.putBoolean("LazyMode", be.isLazyMode());
                 stack.set(DataComponentTypes.BLOCK_ENTITY_DATA,
                         net.minecraft.component.type.NbtComponent.of(nbt));
                 Block.dropStack(world, pos, stack);
@@ -132,9 +131,6 @@ public class NPlushBlock extends BlockWithEntity implements PlushieSoundProvider
             if (nbt.contains("Variant")) {
                 try { be.setVariant(NPlushVariant.valueOf(nbt.getString("Variant"))); }
                 catch (IllegalArgumentException ignored) {}
-            }
-            if (nbt.contains("LazyMode")) {
-                be.setLazyMode(nbt.getBoolean("LazyMode"));
             }
         }
 

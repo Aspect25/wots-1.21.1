@@ -32,11 +32,13 @@ public class UziPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     // ── Variant ───────────────────────────────────────────────────────────────
     private UziPlushVariant variant = UziPlushVariant.UZI_PLUSH;
-    private boolean lazyMode = false;
-    private int lazyTimer = 0;
+
+    // ── Redstone state ────────────────────────────────────────────────────────
+    // Persisted so we correctly detect rising edge after chunk reload.
+    private boolean wasPowered = false;
 
     public UziPlushVariant getVariant() { return variant; }
-    public boolean isLazyMode() { return lazyMode; }
+    public boolean wasPowered() { return wasPowered; }
 
     public void setVariant(UziPlushVariant variant) {
         this.variant = variant;
@@ -46,29 +48,14 @@ public class UziPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
         }
     }
 
-    public void setLazyMode(boolean lazy) {
-        this.lazyMode = lazy;
-        this.lazyTimer = 0;
-        markDirty();
-    }
-
-    // ── Lazy Mode tick ────────────────────────────────────────────────────────
-    public static void tick(World world, BlockPos pos, BlockState state, UziPlushBlockEntity be) {
-        if (!be.lazyMode) return;
-        be.lazyTimer--;
-        if (be.lazyTimer <= 0) {
-            be.lazyTimer = 6000 + world.random.nextInt(210000);
-            UziPlushVariant[] variants = UziPlushVariant.values();
-            UziPlushVariant next;
-            do {
-                next = variants[world.random.nextInt(variants.length)];
-            } while (next == be.variant);
-            be.setVariant(next);
+    public void setWasPowered(boolean powered) {
+        if (this.wasPowered != powered) {
+            this.wasPowered = powered;
+            markDirty();
         }
     }
 
     // ── Sound ─────────────────────────────────────────────────────────────────
-    // public so UziPlushBlock can reference durations for shelf-slot sound state
     public static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
             Map.entry(ModSounds.UZI_NOISE,   80),
             Map.entry(ModSounds.UZI_NOISE_2, 20),
@@ -110,7 +97,7 @@ public class UziPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.putString("Variant", variant.name());
-        nbt.putBoolean("LazyMode", lazyMode);
+        nbt.putBoolean("WasPowered", wasPowered);
     }
 
     @Override
@@ -121,7 +108,7 @@ public class UziPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
         } catch (IllegalArgumentException e) {
             variant = UziPlushVariant.UZI_PLUSH;
         }
-        lazyMode = nbt.getBoolean("LazyMode");
+        wasPowered = nbt.getBoolean("WasPowered");
     }
 
     // ── Sync ──────────────────────────────────────────────────────────────────

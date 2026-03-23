@@ -21,18 +21,11 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 import net.wots.util.ShuffledSoundQueue;
 
-public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
+public class DollPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    // ── Cluster hum constants ─────────────────────────────────────────────────
-    /** How often (in ticks) we scan for nearby Cyn plushies. 100 = every 5 sec. */
-    private static final int HUM_CHECK_INTERVAL = 100;
-    /** Horizontal/vertical radius to scan for sibling Cyns. */
-    private static final int HUM_SCAN_RADIUS_H = 6;
-    private static final int HUM_SCAN_RADIUS_V = 2;
-    /** Minimum cluster size before the hum starts. A lone Cyn is silent. */
-    private static final int HUM_MIN_COUNT = 2;
+
 
     public static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
             Map.entry(ModSounds.CYN_NOISE_1,  40),
@@ -48,38 +41,12 @@ public class CynPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     private final ShuffledSoundQueue soundQueue;
 
-    public CynPlushBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.CYN_PLUSH_BLOCK_ENTITY, pos, state);
+    public DollPlushBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlocks.DOLL_PLUSH_BLOCK_ENTITY, pos, state);
         soundQueue = new ShuffledSoundQueue(SOUND_DURATIONS);
     }
 
-//    // ── Server tick: cluster hum ──────────────────────────────────────────────
-//    public static void tick(World world, BlockPos pos, BlockState state, CynPlushBlockEntity be) {
-//        if (world.isClient) return;
-//        if (world.getTime() % HUM_CHECK_INTERVAL != 0) return;
-//
-//        // Count nearby Cyn plushies (not counting ourselves).
-//        int cynCount = 0;
-//        for (int dx = -HUM_SCAN_RADIUS_H; dx <= HUM_SCAN_RADIUS_H; dx++) {
-//            for (int dy = -HUM_SCAN_RADIUS_V; dy <= HUM_SCAN_RADIUS_V; dy++) {
-//                for (int dz = -HUM_SCAN_RADIUS_H; dz <= HUM_SCAN_RADIUS_H; dz++) {
-//                    if (dx == 0 && dy == 0 && dz == 0) continue;
-//                    if (world.getBlockState(pos.add(dx, dy, dz)).getBlock() instanceof CynPlushBlock) {
-//                        cynCount++;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (cynCount < HUM_MIN_COUNT) return;
-//
-//        // Volume scales with cluster size: 2 = quiet, 5+ = loud.
-//        // Capped at 1.0 (max vanilla volume). Pitch drops slightly as cluster grows.
-//        float volume = Math.min(0.2f + (cynCount - 1) * 0.15f, 1.0f);
-//        float pitch  = Math.max(0.9f - (cynCount - 1) * 0.04f, 0.6f);
-//
-//        world.playSound(null, pos, ModSounds.STATIC, SoundCategory.BLOCKS, volume, pitch);
-//    }
+
 
     // ── Click sound ───────────────────────────────────────────────────────────
     public void playNextSound() {

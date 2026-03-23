@@ -6,11 +6,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.component.DataComponentTypes;
@@ -19,6 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.wots.block.ModBlocks;
 import net.wots.block.entity.CynPlushBlockEntity;
+import net.wots.block.entity.DollPlushBlockEntity;
 import net.wots.block.entity.NPlushBlockEntity;
 import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.nplush.NPlushVariant;
@@ -26,6 +25,7 @@ import net.wots.block.plushies.uziplush.UziPlushVariant;
 import net.wots.client.CustomStonecutterScreen;
 import net.wots.client.ModKeybindings;
 import net.wots.client.PlushieSoundKeyHandler;
+import net.wots.client.SolverEyeOverlay;
 import net.wots.client.VariantChangeParticles;
 import net.wots.client.renderer.*;
 import net.wots.network.SyncVariantUnlocksPayload;
@@ -46,14 +46,17 @@ public class WotsClient implements ClientModInitializer {
             VariantChangeParticles.spawnBurst(payload.pos(), payload.color());
         });
 
-
+        // ── Block entity renderers ────────────────────────────────────────────
         BlockEntityRendererRegistry.register(ModBlocks.PLUSHIE_SHELF_BLOCK_ENTITY, PlushieShelfBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.UZI_PLUSH_BLOCK_ENTITY, UziPlushBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.N_PLUSH_BLOCK_ENTITY, NPlushBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.UZI_HUGE_BLOCK_ENTITY, UziHugeBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlocks.CYN_PLUSH_BLOCK_ENTITY, CynPlushBlockEntityRenderer::new);
         BlockEntityRendererRegistry.register(ModBlocks.SIGMA_BLOCK_ENTITY, SigmaBlockEntityRenderer::new);
+        BlockEntityRendererRegistry.register(ModBlocks.DOLL_PLUSH_BLOCK_ENTITY, DollPlushBlockEntityRenderer::new);
 
+
+        // ── Item renderers ───────────────────────────────────────────────────
         BuiltinItemRendererRegistry.INSTANCE.register(
                 ModBlocks.UZI_PLUSH.asItem(),
                 (ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
@@ -93,12 +96,7 @@ public class WotsClient implements ClientModInitializer {
                             .renderEntity(be, matrices, vertexConsumers, light, overlay);
                 }
         );
-        AccessoriesRendererRegistry.registerRenderer(ModBlocks.UZI_PLUSH.asItem(),
-                UziPlushAccessoryRenderer::new);
-        AccessoriesRendererRegistry.registerRenderer(ModBlocks.N_PLUSH.asItem(),
-                UziPlushAccessoryRenderer::new);
-        ModKeybindings.register();
-        PlushieSoundKeyHandler.register();
+
         BuiltinItemRendererRegistry.INSTANCE.register(
                 ModBlocks.CYN_PLUSH.asItem(),
                 (ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
@@ -110,7 +108,43 @@ public class WotsClient implements ClientModInitializer {
                             .renderEntity(be, matrices, vertexConsumers, light, overlay);
                 }
         );
+        BuiltinItemRendererRegistry.INSTANCE.register(
+                ModBlocks.DOLL_PLUSH.asItem(),
+                (ItemStack stack, ModelTransformationMode mode, MatrixStack matrices,
+                 VertexConsumerProvider vertexConsumers, int light, int overlay) -> {
+                    DollPlushBlockEntity be = new DollPlushBlockEntity(
+                            BlockPos.ORIGIN, ModBlocks.DOLL_PLUSH.getDefaultState());
+                    net.minecraft.client.MinecraftClient.getInstance()
+                            .getBlockEntityRenderDispatcher()
+                            .renderEntity(be, matrices, vertexConsumers, light, overlay);
+                }
+        );
 
+        // ── Accessory renderers ───────────────────────────────────────────────
+        AccessoriesRendererRegistry.registerRenderer(ModBlocks.UZI_PLUSH.asItem(),
+                UziPlushAccessoryRenderer::new);
+        AccessoriesRendererRegistry.registerRenderer(ModBlocks.N_PLUSH.asItem(),
+                UziPlushAccessoryRenderer::new);
         AccessoriesRendererRegistry.registerRenderer(ModBlocks.CYN_PLUSH.asItem(),
                 UziPlushAccessoryRenderer::new);
-}}
+
+        // ── Keybindings & sound ───────────────────────────────────────────────
+        ModKeybindings.register();
+        PlushieSoundKeyHandler.register();
+
+        // ── Screen handlers ───────────────────────────────────────────────────
+        HandledScreens.register(Wots.CUSTOM_STONECUTTER_HANDLER, CustomStonecutterScreen::new);
+
+        // ── Copper 9 day/night slipperiness ──────────────────────────────────
+        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.world != null) {
+                net.wots.block.CopperNineBlock.isNight = client.world.isNight();
+            }
+        });
+
+        // ── Solver Eye night overlay ──────────────────────────────────────────
+        // Registers a HUD callback that pulses faint Solver-gold when the
+        // Solver Eye is held in the offhand at night. No gameplay effect.
+        SolverEyeOverlay.register();
+    }
+}

@@ -1,7 +1,6 @@
 package net.wots.item;
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -9,7 +8,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.wots.Wots;
-import net.wots.block.CustomStonecutterBlock;
 import net.wots.block.ModBlocks;
 
 public class ModItemGroups {
@@ -28,9 +26,12 @@ public class ModItemGroups {
                         entries.add(ModBlocks.SIGMA_BLOCK);
                         entries.add(ModBlocks.THE_DUCKLER);
                         entries.add(ModBlocks.LUMINITE_BLOCK);
+                        // ── New in this update ───────────────────────────────
+                        entries.add(ModBlocks.SOLVER_BLOCK);
+                        entries.add(ModBlocks.COPPER_NINE_BLOCK);
+                        entries.add(ModItems.SOLVER_EYE);
+                        entries.add(ModBlocks.DOLL_PLUSH);
                     }).build());
-
-
 
     public static void registerItemGroups() {
         Wots.LOGGER.info("Registering Item Groups for " + Wots.MOD_ID);

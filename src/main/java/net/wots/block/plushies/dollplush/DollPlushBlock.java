@@ -1,4 +1,4 @@
-package net.wots.block.plushies.cynplush;
+package net.wots.block.plushies.dollplush;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.wots.block.entity.DollPlushBlockEntity;
 import net.wots.util.VoxelShapeHelper;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -27,7 +28,7 @@ import net.wots.block.entity.CynPlushBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
 import net.wots.unlock.VariantUnlockManager;
 
-public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvider {
+public class DollPlushBlock extends BlockWithEntity implements PlushieSoundProvider {
 
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
@@ -40,14 +41,14 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
     }
 
-    public CynPlushBlock(Settings settings) {
+    public DollPlushBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }
 
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return createCodec(CynPlushBlock::new);
+        return createCodec(DollPlushBlock::new);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new CynPlushBlockEntity(pos, state);
+        return new DollPlushBlockEntity(pos, state);
     }
 
 //    // ── Ticker: drives the cluster hum every 5 seconds ───────────────────────
@@ -96,7 +97,7 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof CynPlushBlockEntity be) {
+        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof DollPlushBlockEntity be) {
             be.stopSound();
             if (!world.isClient) {
                 Block.dropStack(world, pos, new ItemStack(state.getBlock().asItem()));
@@ -124,10 +125,10 @@ public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
+        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof DollPlushBlockEntity be) {
             be.playNextSound();
         }
-        if (world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
+        if (world.isClient && world.getBlockEntity(shelfPos) instanceof DollPlushBlockEntity be) {
             be.triggerAnim("controller", "bounce");
         }
     }

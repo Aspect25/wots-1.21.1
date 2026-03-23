@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -30,6 +31,7 @@ import net.wots.block.ModBlocks;
 import net.wots.block.entity.PlushieShelfBlockEntity;
 import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
+import net.wots.sound.ModSounds;
 import net.wots.unlock.VariantUnlockManager;
 
 import java.util.*;
@@ -84,10 +86,7 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        if (world.isClient) return null;
-        if (type != ModBlocks.UZI_PLUSH_BLOCK_ENTITY) return null;
-        //noinspection unchecked
-        return (BlockEntityTicker<T>) (BlockEntityTicker<UziPlushBlockEntity>) UziPlushBlockEntity::tick;
+        return null; // No server tick needed — redstone handled via neighborUpdate
     }
 
     @Override
@@ -105,6 +104,41 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return getOutlineShape(state, world, pos, ctx);
     }
 
+    // ── Redstone burst: warning shot on rising edge ───────────────────────────
+    /**
+     * Fires once when redstone power turns ON (rising edge only).
+     * Plays UZI_NOISE_7 and sprays CRIT particles from the plushie's centre.
+     * Good for alarm systems, dramatic builds, or just being chaotic.
+     * Does nothing while continuously powered — only reacts to the transition.
+     */
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos,
+                               Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        if (world.isClient) return;
+        if (!(world.getBlockEntity(pos) instanceof UziPlushBlockEntity be)) return;
+
+        boolean powered = world.isReceivingRedstonePower(pos);
+
+        if (powered && !be.wasPowered()) {
+            // Rising edge — fire the warning burst
+            world.playSound(null, pos, ModSounds.UZI_NOISE_7, SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+            // Spray CRIT particles from the plushie's centre
+            if (world instanceof ServerWorld sw) {
+                sw.spawnParticles(
+                        ParticleTypes.CRIT,
+                        pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
+                        18,         // count — smaller than UziHuge, she is pocket-sized
+                        0.25, 0.25, 0.25,
+                        0.2         // speed
+                );
+            }
+        }
+
+        be.setWasPowered(powered);
+    }
+
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof UziPlushBlockEntity be) {
@@ -115,7 +149,6 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
                 NbtCompound nbt = new NbtCompound();
                 nbt.putString("id", "wots:uzi_plush");
                 nbt.putString("Variant", be.getVariant().name());
-                nbt.putBoolean("LazyMode", be.isLazyMode());
                 stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(nbt));
                 Block.dropStack(world, pos, stack);
             }
@@ -137,12 +170,8 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
                 try { be.setVariant(UziPlushVariant.valueOf(nbt.getString("Variant"))); }
                 catch (IllegalArgumentException ignored) {}
             }
-            if (nbt.contains("LazyMode")) {
-                be.setLazyMode(nbt.getBoolean("LazyMode"));
-            }
         }
 
-        // ── Unlock checks on placement ───────────────────────────────────
         if (placer instanceof ServerPlayerEntity player) {
             VariantUnlockManager.onPlushiePlaced((ServerWorld) world, pos, player, "uzi");
             VariantUnlockManager.checkNeighborsForUziUnlocks((ServerWorld) world, pos, player);
@@ -152,7 +181,6 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos,
                                  PlayerEntity player, BlockHitResult hit) {
-        // ── Drunk unlock check ───────────────────────────────────────────
         if (!world.isClient && player instanceof ServerPlayerEntity sp) {
             VariantUnlockManager.onPlushieUsed(sp, "uzi");
         }
@@ -168,7 +196,6 @@ public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvid
         return ActionResult.SUCCESS;
     }
 
-    // ── Angyaf unlock — hit detection ─────────────────────────────────────
     @Override
     public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
         if (!world.isClient && player instanceof ServerPlayerEntity sp) {

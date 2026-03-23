@@ -20,9 +20,10 @@ import net.minecraft.world.WorldView;
 import net.wots.block.ModBlocks;
 import net.wots.block.entity.UziHugeBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
-import net.wots.sound.ModSounds;
 
 import java.util.*;
+
+import net.wots.sound.ModSounds;
 import net.wots.util.ShuffledSoundQueue;
 
 public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvider {
@@ -135,7 +136,6 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
 
     // ── Sound ─────────────────────────────────────────────────────────────────
 
-    // Called when the origin block itself is clicked
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos,
                                  PlayerEntity player, BlockHitResult hit) {
@@ -143,14 +143,11 @@ public class UziHugeBlock extends BlockWithEntity implements PlushieSoundProvide
         return ActionResult.SUCCESS;
     }
 
-    // Called by PlushieSoundProvider — keeps shelf and other code working unchanged
     @Override
     public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
         playFromPos(world, shelfPos, shelfPos, player);
     }
 
-    // Called by UziHugePhantomBlock — passes the clicked phantom pos so SPP
-    // raycasts from the player to the exact block they touched, no muffling
     public void playFromPos(World world, BlockPos shelfPos, BlockPos soundPos, PlayerEntity player) {
         if (!world.isClient) {
             SoundEvent sound = SOUND_QUEUE.tryAdvance(world.getTime());

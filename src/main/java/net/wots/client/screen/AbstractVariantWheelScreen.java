@@ -32,7 +32,7 @@ public abstract class AbstractVariantWheelScreen extends Screen {
     protected abstract String variantDisplayName(int i);
     protected abstract int variantColor(int i);
     protected abstract String variantEnumName(int i);
-    protected abstract void sendPayload(BlockPos pos, String variantName, boolean lazyMode);
+    protected abstract void sendPayload(BlockPos pos, String variantName);
 
     /**
      * Override in subclass to return "n" or "uzi".
@@ -100,11 +100,8 @@ public abstract class AbstractVariantWheelScreen extends Screen {
             }
         }
 
-        // Center "Lazy" button
+        // Center disc (decorative, no function)
         drawDisc(ctx, cx, cy, (int) INNER_R, 0xBB1A1A1A);
-        boolean hoverCenter = (dx * dx + dy * dy) <= INNER_R * INNER_R;
-        ctx.drawCenteredTextWithShadow(textRenderer, "Lazy",
-                cx, cy - textRenderer.fontHeight / 2, hoverCenter ? 0xFFFF55 : 0xAAAAAA);
 
         // Tooltip for locked variants
         if (hoveredIndex >= 0 && !isVariantUnlocked(hoveredIndex)) {
@@ -123,14 +120,6 @@ public abstract class AbstractVariantWheelScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         int cx = width / 2, cy = height / 2;
-        double dx = mx - cx, dy = my - cy;
-
-        // Center = Lazy mode
-        if (dx * dx + dy * dy <= INNER_R * INNER_R) {
-            sendPayload(targetPos, "LAZY", true);
-            close();
-            return true;
-        }
 
         if (button == 0 && hoveredIndex >= 0) {
             if (!isVariantUnlocked(hoveredIndex)) {
@@ -140,7 +129,7 @@ public abstract class AbstractVariantWheelScreen extends Screen {
                 }
                 return true; // Consume click but don't send packet
             }
-            sendPayload(targetPos, variantEnumName(hoveredIndex), false);
+            sendPayload(targetPos, variantEnumName(hoveredIndex));
             close();
             return true;
         }

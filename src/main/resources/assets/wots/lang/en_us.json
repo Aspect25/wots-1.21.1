@@ -84,5 +84,6 @@
   "block.wots.uzi_huge": "Huge uzi",
   "key.wots.plushie_hat_sound":  "Squeeze Hat Plushie",
   "key.wots.plushie_back_sound": "Squeeze Back Plushie",
-  "category.wots.plushies":      "Wots Plushies"
+  "category.wots.plushies":      "Wots Plushies",
+  "block.wots.doll_plush": "Doll"
 }

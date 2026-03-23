@@ -14,7 +14,7 @@ import net.wots.block.entity.NPlushBlockEntity;
 import net.wots.block.plushies.nplush.NPlushVariant;
 import net.wots.unlock.VariantUnlockData;
 
-public record SetNVariantPayload(BlockPos pos, String variantName, boolean lazyMode)
+public record SetNVariantPayload(BlockPos pos, String variantName)
         implements CustomPayload {
 
     public static final Id<SetNVariantPayload> ID =
@@ -24,7 +24,6 @@ public record SetNVariantPayload(BlockPos pos, String variantName, boolean lazyM
             PacketCodec.tuple(
                     BlockPos.PACKET_CODEC, SetNVariantPayload::pos,
                     PacketCodecs.STRING,   SetNVariantPayload::variantName,
-                    PacketCodecs.BOOL,     SetNVariantPayload::lazyMode,
                     SetNVariantPayload::new
             );
 
@@ -39,28 +38,23 @@ public record SetNVariantPayload(BlockPos pos, String variantName, boolean lazyM
                     ServerPlayerEntity player = ctx.player();
                     var world = player.getServerWorld();
                     if (world.getBlockEntity(payload.pos()) instanceof NPlushBlockEntity be) {
-                        if (payload.lazyMode()) {
-                            be.setLazyMode(true);
-                        } else {
-                            be.setLazyMode(false);
-                            try {
-                                NPlushVariant variant = NPlushVariant.valueOf(payload.variantName());
+                        try {
+                            NPlushVariant variant = NPlushVariant.valueOf(payload.variantName());
 
-                                // ── Unlock check ──────────────────────────────
-                                VariantUnlockData data = VariantUnlockData.get(ctx.server());
-                                if (!data.isUnlocked(player.getUuid(), variant.name())) {
-                                    return; // Variant is locked — ignore the request
-                                }
+                            // ── Unlock check ──────────────────────────────
+                            VariantUnlockData data = VariantUnlockData.get(ctx.server());
+                            if (!data.isUnlocked(player.getUuid(), variant.name())) {
+                                return; // Variant is locked — ignore the request
+                            }
 
-                                NPlushVariant oldVariant = be.getVariant();
-                                be.setVariant(variant);
+                            NPlushVariant oldVariant = be.getVariant();
+                            be.setVariant(variant);
 
-                                // ── Particle effect on variant change ─────────
-                                if (oldVariant != variant) {
-                                    sendVariantChangeParticles(world, payload.pos(), variant.color);
-                                }
-                            } catch (IllegalArgumentException ignored) {}
-                        }
+                            // ── Particle effect on variant change ─────────
+                            if (oldVariant != variant) {
+                                sendVariantChangeParticles(world, payload.pos(), variant.color);
+                            }
+                        } catch (IllegalArgumentException ignored) {}
                     }
                 })
         );

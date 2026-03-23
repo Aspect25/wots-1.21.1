@@ -13,7 +13,7 @@ public class NVariantWheelScreen extends AbstractVariantWheelScreen {
     @Override protected int variantColor(int i)          { return V[i].color; }
     @Override protected String variantEnumName(int i)    { return V[i].name(); }
     @Override protected String characterId()             { return "n"; }
-    @Override protected void sendPayload(BlockPos pos, String name, boolean lazy) {
-        ClientPlayNetworking.send(new SetNVariantPayload(pos, name, lazy));
+    @Override protected void sendPayload(BlockPos pos, String name) {
+        ClientPlayNetworking.send(new SetNVariantPayload(pos, name));
     }
 }

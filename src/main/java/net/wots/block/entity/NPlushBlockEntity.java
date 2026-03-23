@@ -2,6 +2,8 @@ package net.wots.block.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -13,6 +15,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.wots.block.ModBlocks;
@@ -30,13 +33,24 @@ public class NPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
+    // ── Aura constants ────────────────────────────────────────────────────────
+    /** Radius in blocks where N confuses nearby hostile mob targeting. */
+    private static final double AURA_RADIUS = 8.0;
+    /**
+     * Every N ticks the aura runs. 40 = every 2 seconds.
+     * Low enough to feel responsive, high enough not to tank performance.
+     */
+    private static final int AURA_INTERVAL = 40;
+    /**
+     * Probability per mob per aura pulse that its target is cleared.
+     * 35% feels subtle — mobs hesitate, they don't ignore the player forever.
+     */
+    private static final float AURA_CLEAR_CHANCE = 0.35f;
+
     // ── Variant ───────────────────────────────────────────────────────────────
     private NPlushVariant variant = NPlushVariant.N_PLUSH;
-    private boolean lazyMode = false;
-    private int lazyTimer = 0;
 
     public NPlushVariant getVariant() { return variant; }
-    public boolean isLazyMode() { return lazyMode; }
 
     public void setVariant(NPlushVariant variant) {
         this.variant = variant;
@@ -46,29 +60,24 @@ public class NPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
         }
     }
 
-    public void setLazyMode(boolean lazy) {
-        this.lazyMode = lazy;
-        this.lazyTimer = 0;
-        markDirty();
-    }
-
-    // ── Lazy Mode tick ────────────────────────────────────────────────────────
+    // ── Tick ──────────────────────────────────────────────────────────────────
     public static void tick(World world, BlockPos pos, BlockState state, NPlushBlockEntity be) {
-        if (!be.lazyMode) return;
-        be.lazyTimer--;
-        if (be.lazyTimer <= 0) {
-            be.lazyTimer = 6000 + world.random.nextInt(210000);
-            NPlushVariant[] variants = NPlushVariant.values();
-            NPlushVariant next;
-            do {
-                next = variants[world.random.nextInt(variants.length)];
-            } while (next == be.variant);
-            be.setVariant(next);
+        // ── N's aura: confuse nearby hostile mob targeting ────────────────
+        // Runs server-side only on a fixed interval.
+        // Each hostile mob in range has a small chance of losing its current
+        // target for one tick — a brief hesitation, not a permanent repel.
+        if (!world.isClient && world.getTime() % AURA_INTERVAL == 0) {
+            Box auraBox = Box.of(Vec3d.ofCenter(pos), AURA_RADIUS * 2, AURA_RADIUS * 2, AURA_RADIUS * 2);
+            world.getEntitiesByClass(MobEntity.class, auraBox, e -> e instanceof HostileEntity)
+                    .forEach(mob -> {
+                        if (mob.getTarget() != null && world.random.nextFloat() < AURA_CLEAR_CHANCE) {
+                            mob.setTarget(null);
+                        }
+                    });
         }
     }
 
     // ── Sound ─────────────────────────────────────────────────────────────────
-    // public so NPlushBlock can reuse these durations for shelf-slot sound state
     public static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
             Map.entry(ModSounds.N_NOISE_1,   20),
             Map.entry(ModSounds.N_NOISE_2,   20),
@@ -116,7 +125,6 @@ public class NPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
         nbt.putString("Variant", variant.name());
-        nbt.putBoolean("LazyMode", lazyMode);
     }
 
     @Override
@@ -127,7 +135,6 @@ public class NPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
         } catch (IllegalArgumentException e) {
             variant = NPlushVariant.N_PLUSH;
         }
-        lazyMode = nbt.getBoolean("LazyMode");
     }
 
     // ── Sync ──────────────────────────────────────────────────────────────────

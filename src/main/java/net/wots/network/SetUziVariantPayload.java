@@ -14,7 +14,7 @@ import net.wots.block.entity.UziPlushBlockEntity;
 import net.wots.block.plushies.uziplush.UziPlushVariant;
 import net.wots.unlock.VariantUnlockData;
 
-public record SetUziVariantPayload(BlockPos pos, String variantName, boolean lazyMode)
+public record SetUziVariantPayload(BlockPos pos, String variantName)
         implements CustomPayload {
 
     public static final Id<SetUziVariantPayload> ID =
@@ -24,7 +24,6 @@ public record SetUziVariantPayload(BlockPos pos, String variantName, boolean laz
             PacketCodec.tuple(
                     BlockPos.PACKET_CODEC, SetUziVariantPayload::pos,
                     PacketCodecs.STRING,   SetUziVariantPayload::variantName,
-                    PacketCodecs.BOOL,     SetUziVariantPayload::lazyMode,
                     SetUziVariantPayload::new
             );
 
@@ -39,28 +38,23 @@ public record SetUziVariantPayload(BlockPos pos, String variantName, boolean laz
                     ServerPlayerEntity player = ctx.player();
                     var world = player.getServerWorld();
                     if (world.getBlockEntity(payload.pos()) instanceof UziPlushBlockEntity be) {
-                        if (payload.lazyMode()) {
-                            be.setLazyMode(true);
-                        } else {
-                            be.setLazyMode(false);
-                            try {
-                                UziPlushVariant variant = UziPlushVariant.valueOf(payload.variantName());
+                        try {
+                            UziPlushVariant variant = UziPlushVariant.valueOf(payload.variantName());
 
-                                // ── Unlock check ──────────────────────────────
-                                VariantUnlockData data = VariantUnlockData.get(ctx.server());
-                                if (!data.isUnlocked(player.getUuid(), variant.name())) {
-                                    return; // Variant is locked — ignore the request
-                                }
+                            // ── Unlock check ──────────────────────────────
+                            VariantUnlockData data = VariantUnlockData.get(ctx.server());
+                            if (!data.isUnlocked(player.getUuid(), variant.name())) {
+                                return; // Variant is locked — ignore the request
+                            }
 
-                                UziPlushVariant oldVariant = be.getVariant();
-                                be.setVariant(variant);
+                            UziPlushVariant oldVariant = be.getVariant();
+                            be.setVariant(variant);
 
-                                // ── Particle effect on variant change ─────────
-                                if (oldVariant != variant) {
-                                    sendVariantChangeParticles(world, payload.pos(), variant.color);
-                                }
-                            } catch (IllegalArgumentException ignored) {}
-                        }
+                            // ── Particle effect on variant change ─────────
+                            if (oldVariant != variant) {
+                                sendVariantChangeParticles(world, payload.pos(), variant.color);
+                            }
+                        } catch (IllegalArgumentException ignored) {}
                     }
                 })
         );
