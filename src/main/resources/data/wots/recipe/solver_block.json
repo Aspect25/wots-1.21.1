@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " Q ",
+    "QSQ",
+    " Q "
+  ],
+  "key": {
+    "Q": { "item": "minecraft:quartz" },
+    "S": { "item": "minecraft:soul_sand" }
+  },
+  "result": {
+    "id": "wots:solver_block",
+    "count": 2
+  }
+}
