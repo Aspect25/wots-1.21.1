@@ -1,31 +1,67 @@
 package net.wots.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.BlockPos;
 import net.wots.block.ModBlocks;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import net.wots.block.plushies.uziplush.UziPlushVariant;
+import net.wots.util.ShuffledSoundQueue;
 
-public class UziHugeBlockEntity extends BlockEntity implements GeoBlockEntity {
+import java.util.EnumMap;
+import java.util.Map;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+/**
+ * Huge Uzi block entity -- shares all variants and per-variant voice lines
+ * with the regular Uzi plush.
+ */
+public class UziHugeBlockEntity extends AbstractPlushieBlockEntity<UziPlushVariant> {
+
+    private final EnumMap<UziPlushVariant, ShuffledSoundQueue> variantQueues =
+            new EnumMap<>(UziPlushVariant.class);
 
     public UziHugeBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.UZI_HUGE_BLOCK_ENTITY, pos, state);
+        super(ModBlocks.UZI_HUGE_BLOCK_ENTITY, pos, state,
+                UziPlushVariant.UZI_PLUSH, UziPlushVariant.class,
+                UziPlushBlockEntity.DEFAULT_SOUNDS);
+    }
+
+    private ShuffledSoundQueue queueForCurrentVariant() {
+        return variantQueues.computeIfAbsent(getVariant(), v -> {
+            Map<SoundEvent, Integer> durations = UziPlushBlockEntity.VARIANT_SOUND_MAP.get(v);
+            if (durations != null && !durations.isEmpty()) {
+                return new ShuffledSoundQueue(durations);
+            }
+            return new ShuffledSoundQueue(UziPlushBlockEntity.DEFAULT_SOUNDS);
+        });
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(
-                new AnimationController<>(this, "controller", 2, state -> PlayState.STOP)
-                        .triggerableAnim("bounce", RawAnimation.begin()
-                                .then("squeesh", Animation.LoopType.PLAY_ONCE))
-        );
+    public void playNextSound() {
+        if (level == null || level.isClientSide()) return;
+        ShuffledSoundQueue queue = queueForCurrentVariant();
+        SoundEvent sound = queue.tryAdvance(level.getGameTime());
+        if (sound == null) return;
+        level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
+    public void stopSound() {
+        if (level == null || level.isClientSide()) return;
+        ShuffledSoundQueue queue = queueForCurrentVariant();
+        SoundEvent current = queue.getCurrentlyPlaying();
+        if (current != null) {
+            ClientboundStopSoundPacket packet = new ClientboundStopSoundPacket(
+                    BuiltInRegistries.SOUND_EVENT.getKey(current), SoundSource.BLOCKS);
+            for (var player : level.getServer().getPlayerList().getPlayers()) {
+                if (player.distanceToSqr(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()) < 64 * 64) {
+                    player.connection.send(packet);
+                }
+            }
+            queue.clearCurrent();
+        }
+    }
 }

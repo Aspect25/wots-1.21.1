@@ -1,6 +1,8 @@
 package net.wots.block.plushies.nplush;
 
-public enum NPlushVariant {
+import net.wots.block.plushies.PlushieVariant;
+
+public enum NPlushVariant implements PlushieVariant {
     N_PLUSH          ("Default",       0x9B8BB4),
     N_PLUSH_ANGY     ("Angy",          0xC94C4C),
     N_PLUSH_ANGYAF   ("Angy AF",       0xFF2222),
@@ -21,4 +23,7 @@ public enum NPlushVariant {
         this.displayName = displayName;
         this.color = color;
     }
+
+    @Override public String displayName() { return displayName; }
+    @Override public int color() { return color; }
 }

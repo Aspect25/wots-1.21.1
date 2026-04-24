@@ -1,5 +1,0 @@
-{
-  "type": "wots:custom_stonecutting",
-  "ingredient": { "tag": "wots:uzi_plushies" },
-  "result": { "id": "wots:uzi_plush_worriedaf", "count": 1 }
-}

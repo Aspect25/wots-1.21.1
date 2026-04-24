@@ -1,21 +1,17 @@
 package net.wots.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.registry.Registries;
-import net.minecraft.item.Item;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.wots.block.ModBlocks;
 import net.wots.sound.ModSounds;
 
@@ -23,27 +19,37 @@ import java.util.Map;
 
 import static net.wots.util.ModTags.Items.TRACKED_TRASH_ITEMS;
 
-public class TrashBlockEntity extends BlockEntity implements Inventory {
-    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
-    
+public class TrashBlockEntity extends BlockEntity implements Container {
+    private final NonNullList<ItemStack> inventory = NonNullList.withSize(1, ItemStack.EMPTY);
+
     // Tag for items that trigger the special counter
     public record ThresholdSound(SoundEvent sound, int pauseDuration) {}
     public static final Map<Integer, ThresholdSound> THRESHOLD_SOUNDS = Map.ofEntries(
-            Map.entry(1,  new ThresholdSound(ModSounds.TRASHED_1,   100)),
-            Map.entry(5,  new ThresholdSound(ModSounds.TRASHED_5,   120)),  // was duplicate 10
-            Map.entry(10, new ThresholdSound(ModSounds.TRASHED_10,  80)),
-            Map.entry(15, new ThresholdSound(ModSounds.TRASHED_15,  80)),
-            Map.entry(20, new ThresholdSound(ModSounds.TRASHED_20,  120)),
-            Map.entry(25, new ThresholdSound(ModSounds.TRASHED_25,  80)),
-            Map.entry(30, new ThresholdSound(ModSounds.TRASHED_30,  60)),
-            Map.entry(35, new ThresholdSound(ModSounds.TRASHED_35,  240)),
-            Map.entry(40, new ThresholdSound(ModSounds.TRASHED_40,  100)),
-            Map.entry(50, new ThresholdSound(ModSounds.TRASHED_50,  240)),
-            Map.entry(69, new ThresholdSound(ModSounds.TRASHED_69,  140)),
-            Map.entry(70, new ThresholdSound(ModSounds.TRASHED_70,  840))
+            // First 4 plushies: one line each
+            Map.entry(1,  new ThresholdSound(ModSounds.GABE_LINE_1,  260)),  // 13s
+            Map.entry(2,  new ThresholdSound(ModSounds.GABE_LINE_2,  380)),  // 19s
+            Map.entry(3,  new ThresholdSound(ModSounds.GABE_LINE_3,  320)),  // 16s
+            Map.entry(4,  new ThresholdSound(ModSounds.GABE_LINE_4,  320)),  // 16s
+            // Then every 5 plushies
+            Map.entry(5,  new ThresholdSound(ModSounds.GABE_LINE_5,  240)),  // 12s
+            Map.entry(10, new ThresholdSound(ModSounds.GABE_LINE_6,  80)),   // 4s
+            Map.entry(15, new ThresholdSound(ModSounds.GABE_LINE_7,  80)),   // 4s
+            Map.entry(20, new ThresholdSound(ModSounds.GABE_LINE_8,  260)),  // 13s
+            Map.entry(25, new ThresholdSound(ModSounds.GABE_LINE_9,  220)),  // 11s
+            Map.entry(30, new ThresholdSound(ModSounds.GABE_LINE_10, 380)),  // 19s
+            Map.entry(35, new ThresholdSound(ModSounds.GABE_LINE_11, 360)),  // 18s
+            Map.entry(40, new ThresholdSound(ModSounds.GABE_LINE_12, 140)),  // 7s
+            Map.entry(45, new ThresholdSound(ModSounds.GABE_LINE_13, 60)),   // 3s
+            Map.entry(50, new ThresholdSound(ModSounds.GABE_LINE_14, 60)),   // 3s
+            Map.entry(55, new ThresholdSound(ModSounds.GABE_LINE_15, 40)),   // 2s
+            Map.entry(60, new ThresholdSound(ModSounds.GABE_LINE_16, 60)),   // 3s
+            Map.entry(65, new ThresholdSound(ModSounds.GABE_LINE_17, 40)),   // 2s
+            Map.entry(70, new ThresholdSound(ModSounds.GABE_LINE_18, 640)),  // 32s
+            Map.entry(75, new ThresholdSound(ModSounds.GABE_LINE_19, 60)),   // 3s
+            Map.entry(80, new ThresholdSound(ModSounds.GABE_LINE_20, 340))   // 17s
     );
 
-    
+
     // Pause duration in ticks (e.g., 100 ticks = 5 seconds)
 
 
@@ -55,8 +61,8 @@ public class TrashBlockEntity extends BlockEntity implements Inventory {
         super(ModBlocks.TRASH_BLOCK_ENTITY, pos, state);
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, TrashBlockEntity entity) {
-        if (world.isClient) return;
+    public static void tick(Level level, BlockPos pos, BlockState state, TrashBlockEntity entity) {
+        if (level.isClientSide()) return;
 
         if (entity.pauseTicks > 0) {
             entity.pauseTicks--;
@@ -64,73 +70,66 @@ public class TrashBlockEntity extends BlockEntity implements Inventory {
         }
 
         entity.progress++;
-        if (entity.progress >= 20) { // 1 item per second (20 ticks)
+        if (entity.progress >= 2) { // 1 item per 2 ticks (10 items per second)
             entity.progress = 0;
             ItemStack currentStack = entity.inventory.get(0);
-            
+
             if (!currentStack.isEmpty()) {
                 // Check if it's a tracked item
-                boolean isTracked = currentStack.isIn(TRACKED_TRASH_ITEMS);
-                
+                boolean isTracked = currentStack.is(TRACKED_TRASH_ITEMS);
+
                 // Delete 1 item
                 ItemStack deleted = currentStack.split(1);
-                
+
                 if (isTracked) {
                     entity.specialItemsDeleted++;
-                    entity.checkThresholds(world, pos);
+                    entity.checkThresholds(level, pos);
                 }
-                
+
                 if (currentStack.isEmpty()) {
                     entity.inventory.set(0, ItemStack.EMPTY);
                 }
-                
-                entity.markDirty();
+
+                entity.setChanged();
             }
         }
     }
 
-    private void checkThresholds(World world, BlockPos pos) {
+    private void checkThresholds(Level level, BlockPos pos) {
         ThresholdSound entry = THRESHOLD_SOUNDS.get(this.specialItemsDeleted);
         if (entry != null) {
-            world.playSound(null, pos, entry.sound(), SoundCategory.BLOCKS, 1.0f, 1.0f);
+            level.playSound(null, pos, entry.sound(), SoundSource.BLOCKS, 1.0f, 1.0f);
             this.pauseTicks = entry.pauseDuration();
-            this.markDirty();
+            this.setChanged();
         }
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.writeNbt(nbt, registries);
-        nbt.putInt("TrashProgress", progress);
-        nbt.putInt("SpecialItemsDeleted", specialItemsDeleted);
-        nbt.putInt("PauseTicks", pauseTicks);
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("TrashProgress", progress);
+        output.putInt("SpecialItemsDeleted", specialItemsDeleted);
+        output.putInt("PauseTicks", pauseTicks);
 
-        // Properly serialize ItemStack for Fabric 1.21.1
         ItemStack stack = inventory.get(0);
         if (!stack.isEmpty()) {
-            NbtCompound itemNbt = (NbtCompound) stack.encodeAllowEmpty(registries);
-            nbt.put("InventoryItem", itemNbt);
+            output.storeNullable("InventoryItem", ItemStack.CODEC, stack);
         }
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.readNbt(nbt, registries);
-        progress = nbt.getInt("TrashProgress");
-        specialItemsDeleted = nbt.getInt("SpecialItemsDeleted");
-        pauseTicks = nbt.getInt("PauseTicks");
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        progress = input.getIntOr("TrashProgress", 0);
+        specialItemsDeleted = input.getIntOr("SpecialItemsDeleted", 0);
+        pauseTicks = input.getIntOr("PauseTicks", 0);
 
-        if (nbt.contains("InventoryItem")) {
-            ItemStack stack = ItemStack.fromNbtOrEmpty(registries, nbt.getCompound("InventoryItem"));
-            inventory.set(0, stack);
-        } else {
-            inventory.set(0, ItemStack.EMPTY);
-        }
+        inventory.set(0, input.read("InventoryItem", ItemStack.CODEC).orElse(ItemStack.EMPTY));
     }
 
-    // Inventory implementation
+    // Container implementation
     @Override
-    public int size() {
+    public int getContainerSize() {
         return inventory.size();
     }
 
@@ -140,42 +139,42 @@ public class TrashBlockEntity extends BlockEntity implements Inventory {
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         return inventory.get(slot);
     }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
+    public ItemStack removeItem(int slot, int amount) {
         ItemStack result = inventory.get(slot).split(amount);
         if (inventory.get(slot).isEmpty()) {
             inventory.set(slot, ItemStack.EMPTY);
         }
-        markDirty();
+        setChanged();
         return result;
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
+    public ItemStack removeItemNoUpdate(int slot) {
         ItemStack result = inventory.get(slot);
         inventory.set(slot, ItemStack.EMPTY);
-        markDirty();
+        setChanged();
         return result;
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         inventory.set(slot, stack);
-        markDirty();
+        setChanged();
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        return Inventory.canPlayerUse(this, player);
+    public boolean stillValid(Player player) {
+        return Container.stillValidBlockEntity(this, player);
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         inventory.clear();
-        markDirty();
+        setChanged();
     }
 }

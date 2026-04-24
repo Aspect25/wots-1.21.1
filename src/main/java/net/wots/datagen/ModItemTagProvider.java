@@ -1,29 +1,11 @@
 package net.wots.datagen;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryWrapper;
-import net.wots.block.ModBlocks;
-import net.wots.block.entity.TrashBlockEntity;
-import net.wots.item.ModItems;
-import net.wots.util.ModTags;
-
-import java.util.concurrent.CompletableFuture;
-
-public class ModItemTagProvider extends FabricTagProvider.ItemTagProvider {
-    public ModItemTagProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> completableFuture) {
-        super(output, completableFuture);
-    }
-
-    @Override
-    protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-
-
-
-
-
-
-
-    }
+/**
+ * TODO: MC 26.1 completely changed the datagen API. All Fabric data generation
+ * providers (FabricTagProvider, FabricBlockLootTableProvider, FabricRecipeProvider,
+ * FabricModelProvider) have been restructured. This needs a full rewrite.
+ * Stubbed for compilation.
+ */
+public class ModItemTagProvider {
+    // Stubbed -- datagen needs full rewrite for MC 26.1
 }

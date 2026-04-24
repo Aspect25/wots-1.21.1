@@ -1,89 +1,80 @@
 package net.wots.block.plushies.tadc.sigma;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.wots.block.entity.SigmaBlockEntity;
 import net.wots.block.plushies.PlushieSoundProvider;
-import net.wots.sound.ModSounds;
-
 import java.util.*;
-import net.wots.util.ShuffledSoundQueue;
 import net.wots.util.VoxelShapeHelper;
 
-public class SigmaBlock extends BlockWithEntity implements PlushieSoundProvider {
+public class SigmaBlock extends BaseEntityBlock implements PlushieSoundProvider {
 
-    private static final Map<SoundEvent, Integer> SOUND_DURATIONS_UZI = Map.ofEntries(
-            Map.entry(ModSounds.UZI_NOISE, 80),
-            Map.entry(ModSounds.UZI_NOISE_2, 20),
-            Map.entry(ModSounds.UZI_NOISE_3, 40),
-            Map.entry(ModSounds.UZI_NOISE_4, 40),
-            Map.entry(ModSounds.UZI_NOISE_5, 60),
-            Map.entry(ModSounds.UZI_NOISE_6, 60)
-    );
+    // No voice lines -- Sigma is silent until she gets her own VA lines
+    private static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.of();
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
-    private static final ShuffledSoundQueue SOUND_QUEUE = new ShuffledSoundQueue(SOUND_DURATIONS_UZI);
-    public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
-
-    // ── VoxelShapes ───────────────────────────────────────────────────────────
+    // ── Shapes ───────────────────────────────────────────────────────────
     private static final VoxelShape SHAPE_NORTH = makeShape();
     private static final VoxelShape SHAPE_SOUTH = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 2);
     private static final VoxelShape SHAPE_EAST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 1);
     private static final VoxelShape SHAPE_WEST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 3);
 
     private static VoxelShape makeShape() {
-        return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
+        return Shapes.box(0.1875, 0, 0.25, 0.8125, 1, 0.875);
     }
 
     // ── Constructor ───────────────────────────────────────────────────────────
-    public SigmaBlock(Settings settings) {
-        super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+    public SigmaBlock(Properties properties) {
+        super(properties);
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return createCodec(net.wots.block.plushies.tadc.sigma.SigmaBlock::new);
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(net.wots.block.plushies.tadc.sigma.SigmaBlock::new);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SigmaBlockEntity(pos, state);
     }
 
     // ── Shapes ────────────────────────────────────────────────────────────────
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return switch (state.get(FACING)) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx) {
+        return switch (state.getValue(FACING)) {
             case SOUTH -> SHAPE_SOUTH;
             case EAST  -> SHAPE_EAST;
             case WEST  -> SHAPE_WEST;
@@ -92,25 +83,22 @@ public class SigmaBlock extends BlockWithEntity implements PlushieSoundProvider 
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return getOutlineShape(state, world, pos, ctx);
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx) {
+        return getShape(state, world, pos, ctx);
     }
 
     // ── Interaction ───────────────────────────────────────────────────────────
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
-                                 PlayerEntity player, BlockHitResult hit) {
-        onShelfInteract(world, pos, 0, player);
-        return ActionResult.SUCCESS;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                 Player player, BlockHitResult hit) {
+        onShelfInteract(level, pos, 0, player);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        if (!world.isClient) {
-            SoundEvent sound = SOUND_QUEUE.tryAdvance(world.getTime());
-            if (sound != null) world.playSound(null, shelfPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
-        }
-        if (world.isClient && world.getBlockEntity(shelfPos) instanceof SigmaBlockEntity blockEntity) {
+    public void onShelfInteract(Level level, BlockPos shelfPos, int slot, Player player) {
+        // Bounce animation only -- no voice lines until Sigma gets her own
+        if (level.isClientSide() && level.getBlockEntity(shelfPos) instanceof SigmaBlockEntity blockEntity) {
             blockEntity.triggerAnim("controller", "bounce");
         }
     }

@@ -1,16 +1,16 @@
 package net.wots.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.network.chat.Component;
 import net.wots.block.entity.CynPlushBlockEntity;
 import net.wots.item.accessory.PlushieSoundAccessory;
 
@@ -21,27 +21,27 @@ public class CynPlushBlockItem extends BlockItem implements PlushieSoundAccessor
 
     private final ShuffledSoundQueue soundQueue = new ShuffledSoundQueue(CynPlushBlockEntity.SOUND_DURATIONS);
 
-    public CynPlushBlockItem(Block block, Settings settings) {
+    public CynPlushBlockItem(Block block, Properties settings) {
         super(block, settings);
     }
 
     @Override
-    public Text getName(ItemStack stack) {
-        return Text.literal("Cyn Plush");
+    public Component getName(ItemStack stack) {
+        return Component.literal("Cyn Plush");
     }
 
     @Override
-    public void playNextPlushieSound(PlayerEntity player) {
-        if (player.getWorld().isClient) return;
-        SoundEvent sound = soundQueue.tryAdvance(player.getWorld().getTime());
+    public void playNextPlushieSound(Player player, ItemStack stack) {
+        if (player.level().isClientSide()) return;
+        SoundEvent sound = soundQueue.tryAdvance(player.level().getGameTime());
         if (sound == null) return;
 
         // Attach sound to entity so it follows the player
-        ServerWorld serverWorld = (ServerWorld) player.getWorld();
-        PlaySoundFromEntityS2CPacket packet = new PlaySoundFromEntityS2CPacket(
-                Registries.SOUND_EVENT.getEntry(sound), SoundCategory.PLAYERS,
-                player, 1.0f, 1.0f, serverWorld.random.nextLong());
-        serverWorld.getPlayers(p -> p.squaredDistanceTo(player) <= 64 * 64)
-                .forEach(p -> ((ServerPlayerEntity) p).networkHandler.sendPacket(packet));
+        ServerLevel serverWorld = (ServerLevel) player.level();
+        ClientboundSoundEntityPacket packet = new ClientboundSoundEntityPacket(
+                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), SoundSource.PLAYERS,
+                player, 1.0f, 1.0f, serverWorld.getRandom().nextLong());
+        serverWorld.getPlayers(p -> p.distanceToSqr(player) <= 64 * 64)
+                .forEach(p -> ((ServerPlayer) p).connection.send(packet));
     }
 }

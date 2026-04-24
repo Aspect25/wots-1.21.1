@@ -1,10 +1,10 @@
 package net.wots.sound;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.resources.Identifier;
 import net.wots.Wots;
 
 public class ModSounds {
@@ -50,18 +50,26 @@ public class ModSounds {
     public static final SoundEvent UZI_NOISE_4 = registerSoundEvent("uzi_noise_4");
     public static final SoundEvent UZI_NOISE_5 = registerSoundEvent("uzi_noise_5");
     public static final SoundEvent UZI_NOISE_6 = registerSoundEvent("uzi_noise_6");
-    public static final SoundEvent TRASHED_1 = registerSoundEvent("trashed_1");
-    public static final SoundEvent TRASHED_5 = registerSoundEvent("trashed_5");
-    public static final SoundEvent TRASHED_10 = registerSoundEvent("trashed_10");
-    public static final SoundEvent TRASHED_15 = registerSoundEvent("trashed_15");
-    public static final SoundEvent TRASHED_20 = registerSoundEvent("trashed_20");
-    public static final SoundEvent TRASHED_25 = registerSoundEvent("trashed_25");
-    public static final SoundEvent TRASHED_30 = registerSoundEvent("trashed_30");
-    public static final SoundEvent TRASHED_35 = registerSoundEvent("trashed_35");
-    public static final SoundEvent TRASHED_40 = registerSoundEvent("trashed_40");
-    public static final SoundEvent TRASHED_50 = registerSoundEvent("trashed_50");
-    public static final SoundEvent TRASHED_69 = registerSoundEvent("trashed_69");
-    public static final SoundEvent TRASHED_70 = registerSoundEvent("trashed_70");
+    public static final SoundEvent GABE_LINE_1  = registerSoundEvent("gabe_line_1");
+    public static final SoundEvent GABE_LINE_2  = registerSoundEvent("gabe_line_2");
+    public static final SoundEvent GABE_LINE_3  = registerSoundEvent("gabe_line_3");
+    public static final SoundEvent GABE_LINE_4  = registerSoundEvent("gabe_line_4");
+    public static final SoundEvent GABE_LINE_5  = registerSoundEvent("gabe_line_5");
+    public static final SoundEvent GABE_LINE_6  = registerSoundEvent("gabe_line_6");
+    public static final SoundEvent GABE_LINE_7  = registerSoundEvent("gabe_line_7");
+    public static final SoundEvent GABE_LINE_8  = registerSoundEvent("gabe_line_8");
+    public static final SoundEvent GABE_LINE_9  = registerSoundEvent("gabe_line_9");
+    public static final SoundEvent GABE_LINE_10 = registerSoundEvent("gabe_line_10");
+    public static final SoundEvent GABE_LINE_11 = registerSoundEvent("gabe_line_11");
+    public static final SoundEvent GABE_LINE_12 = registerSoundEvent("gabe_line_12");
+    public static final SoundEvent GABE_LINE_13 = registerSoundEvent("gabe_line_13");
+    public static final SoundEvent GABE_LINE_14 = registerSoundEvent("gabe_line_14");
+    public static final SoundEvent GABE_LINE_15 = registerSoundEvent("gabe_line_15");
+    public static final SoundEvent GABE_LINE_16 = registerSoundEvent("gabe_line_16");
+    public static final SoundEvent GABE_LINE_17 = registerSoundEvent("gabe_line_17");
+    public static final SoundEvent GABE_LINE_18 = registerSoundEvent("gabe_line_18");
+    public static final SoundEvent GABE_LINE_19 = registerSoundEvent("gabe_line_19");
+    public static final SoundEvent GABE_LINE_20 = registerSoundEvent("gabe_line_20");
 
     // -------------------------------------------------------------------------
     // Duckler sounds
@@ -92,18 +100,115 @@ public class ModSounds {
     public static final SoundEvent TV_USE   = registerSoundEvent("tv_use");
 
     // -------------------------------------------------------------------------
+    // Uzi plush voice lines (per-variant)
+    // -------------------------------------------------------------------------
+    // Default
+    public static final SoundEvent UZI_PLUSH_DEFAULT_1  = registerSoundEvent("uzi_plush_default_1");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_2  = registerSoundEvent("uzi_plush_default_2");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_3  = registerSoundEvent("uzi_plush_default_3");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_4  = registerSoundEvent("uzi_plush_default_4");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_5  = registerSoundEvent("uzi_plush_default_5");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_6  = registerSoundEvent("uzi_plush_default_6");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_7  = registerSoundEvent("uzi_plush_default_7");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_8  = registerSoundEvent("uzi_plush_default_8");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_9  = registerSoundEvent("uzi_plush_default_9");
+    public static final SoundEvent UZI_PLUSH_DEFAULT_10 = registerSoundEvent("uzi_plush_default_10");
+    // Sadge
+    public static final SoundEvent UZI_PLUSH_SADGE_1 = registerSoundEvent("uzi_plush_sadge_1");
+    public static final SoundEvent UZI_PLUSH_SADGE_2 = registerSoundEvent("uzi_plush_sadge_2");
+    public static final SoundEvent UZI_PLUSH_SADGE_3 = registerSoundEvent("uzi_plush_sadge_3");
+    // Scared AF
+    public static final SoundEvent UZI_PLUSH_SCAREDAF_1 = registerSoundEvent("uzi_plush_scaredaf_1");
+    public static final SoundEvent UZI_PLUSH_SCAREDAF_2 = registerSoundEvent("uzi_plush_scaredaf_2");
+    public static final SoundEvent UZI_PLUSH_SCAREDAF_3 = registerSoundEvent("uzi_plush_scaredaf_3");
+    // Spooked
+    public static final SoundEvent UZI_PLUSH_SPOOKED_1 = registerSoundEvent("uzi_plush_spooked_1");
+    public static final SoundEvent UZI_PLUSH_SPOOKED_2 = registerSoundEvent("uzi_plush_spooked_2");
+    public static final SoundEvent UZI_PLUSH_SPOOKED_3 = registerSoundEvent("uzi_plush_spooked_3");
+    // Traumatized
+    public static final SoundEvent UZI_PLUSH_TRAUMATIZED_1 = registerSoundEvent("uzi_plush_traumatized_1");
+    public static final SoundEvent UZI_PLUSH_TRAUMATIZED_2 = registerSoundEvent("uzi_plush_traumatized_2");
+    public static final SoundEvent UZI_PLUSH_TRAUMATIZED_3 = registerSoundEvent("uzi_plush_traumatized_3");
+    // Unamused
+    public static final SoundEvent UZI_PLUSH_UNAMUSED_1 = registerSoundEvent("uzi_plush_unamused_1");
+    public static final SoundEvent UZI_PLUSH_UNAMUSED_2 = registerSoundEvent("uzi_plush_unamused_2");
+    public static final SoundEvent UZI_PLUSH_UNAMUSED_3 = registerSoundEvent("uzi_plush_unamused_3");
+    // Angy
+    public static final SoundEvent UZI_PLUSH_ANGY_1 = registerSoundEvent("uzi_plush_angy_1");
+    public static final SoundEvent UZI_PLUSH_ANGY_2 = registerSoundEvent("uzi_plush_angy_2");
+    public static final SoundEvent UZI_PLUSH_ANGY_3 = registerSoundEvent("uzi_plush_angy_3");
+    // Angy AF
+    public static final SoundEvent UZI_PLUSH_ANGYAF_1 = registerSoundEvent("uzi_plush_angyaf_1");
+    public static final SoundEvent UZI_PLUSH_ANGYAF_2 = registerSoundEvent("uzi_plush_angyaf_2");
+    public static final SoundEvent UZI_PLUSH_ANGYAF_3 = registerSoundEvent("uzi_plush_angyaf_3");
+    // Drunk
+    public static final SoundEvent UZI_PLUSH_DRUNK_1 = registerSoundEvent("uzi_plush_drunk_1");
+    public static final SoundEvent UZI_PLUSH_DRUNK_2 = registerSoundEvent("uzi_plush_drunk_2");
+    public static final SoundEvent UZI_PLUSH_DRUNK_3 = registerSoundEvent("uzi_plush_drunk_3");
+    public static final SoundEvent UZI_PLUSH_DRUNK_4 = registerSoundEvent("uzi_plush_drunk_4");
+    public static final SoundEvent UZI_PLUSH_DRUNK_5 = registerSoundEvent("uzi_plush_drunk_5");
+    // Happy
+    public static final SoundEvent UZI_PLUSH_HAPPY_1 = registerSoundEvent("uzi_plush_happy_1");
+    public static final SoundEvent UZI_PLUSH_HAPPY_2 = registerSoundEvent("uzi_plush_happy_2");
+    public static final SoundEvent UZI_PLUSH_HAPPY_3 = registerSoundEvent("uzi_plush_happy_3");
+    // Worried AF
+    public static final SoundEvent UZI_PLUSH_WORRIEDAF_1 = registerSoundEvent("uzi_plush_worriedaf_1");
+    public static final SoundEvent UZI_PLUSH_WORRIEDAF_2 = registerSoundEvent("uzi_plush_worriedaf_2");
+    public static final SoundEvent UZI_PLUSH_WORRIEDAF_3 = registerSoundEvent("uzi_plush_worriedaf_3");
+    // Worried
+    public static final SoundEvent UZI_PLUSH_WORRIED_1 = registerSoundEvent("uzi_plush_worried_1");
+    public static final SoundEvent UZI_PLUSH_WORRIED_2 = registerSoundEvent("uzi_plush_worried_2");
+    public static final SoundEvent UZI_PLUSH_WORRIED_3 = registerSoundEvent("uzi_plush_worried_3");
+    // Oh No
+    public static final SoundEvent UZI_PLUSH_OHNO_1 = registerSoundEvent("uzi_plush_ohno_1");
+    public static final SoundEvent UZI_PLUSH_OHNO_2 = registerSoundEvent("uzi_plush_ohno_2");
+    public static final SoundEvent UZI_PLUSH_OHNO_3 = registerSoundEvent("uzi_plush_ohno_3");
+    // Smirk
+    public static final SoundEvent UZI_PLUSH_SMIRK_1 = registerSoundEvent("uzi_plush_smirk_1");
+    public static final SoundEvent UZI_PLUSH_SMIRK_2 = registerSoundEvent("uzi_plush_smirk_2");
+    public static final SoundEvent UZI_PLUSH_SMIRK_3 = registerSoundEvent("uzi_plush_smirk_3");
+
+    // -------------------------------------------------------------------------
     // Misc sounds
     // -------------------------------------------------------------------------
     public static final SoundEvent STATIC      = registerSoundEvent("static");
     public static final SoundEvent DUCK_SOUND  = registerSoundEvent("duck_sound");
     public static final SoundEvent UZI_NOISE_7 = registerSoundEvent("uzi_noise_7");
 
+    // -------------------------------------------------------------------------
+    // Broadcast sounds (Collection Broadcast & Gifting)
+    // -------------------------------------------------------------------------
+    public static final SoundEvent COLLECTION_DISCOVER = registerSoundEvent("collection_discover");
+    public static final SoundEvent GIFT_SEND           = registerSoundEvent("gift_send");
+    public static final SoundEvent GIFT_DENY           = registerSoundEvent("gift_deny");
+
+    // -------------------------------------------------------------------------
+    // Doll voice lines (VA records in Russian, subtitles show English)
+    // Add .ogg files to assets/wots/sounds/doll/ when VA delivers them.
+    // -------------------------------------------------------------------------
+    public static final SoundEvent DOLL_DEFAULT_1     = registerSoundEvent("doll_default_1");
+    public static final SoundEvent DOLL_DEFAULT_2     = registerSoundEvent("doll_default_2");
+    public static final SoundEvent DOLL_DEFAULT_3     = registerSoundEvent("doll_default_3");
+    public static final SoundEvent DOLL_HAPPY_1       = registerSoundEvent("doll_happy_1");
+    public static final SoundEvent DOLL_ANGY_1        = registerSoundEvent("doll_angy_1");
+    public static final SoundEvent DOLL_UNAMUSED_1    = registerSoundEvent("doll_unamused_1");
+    public static final SoundEvent DOLL_WORRIED_1     = registerSoundEvent("doll_worried_1");
+    public static final SoundEvent DOLL_SADGE_1       = registerSoundEvent("doll_sadge_1");
+    public static final SoundEvent DOLL_TRAUMATIZED_1 = registerSoundEvent("doll_traumatized_1");
+    public static final SoundEvent DOLL_SPOOKED_1     = registerSoundEvent("doll_spooked_1");
+    public static final SoundEvent DOLL_SCAREDAF_1    = registerSoundEvent("doll_scaredaf_1");
+    public static final SoundEvent DOLL_DRUNK_1       = registerSoundEvent("doll_drunk_1");
+    public static final SoundEvent DOLL_ANGYAF_1      = registerSoundEvent("doll_angyaf_1");
+    public static final SoundEvent DOLL_WORRIEDAF_1   = registerSoundEvent("doll_worriedaf_1");
+    public static final SoundEvent DOLL_OHNO_1        = registerSoundEvent("doll_ohno_1");
+    public static final SoundEvent DOLL_SMIRK_1       = registerSoundEvent("doll_smirk_1");
+
     // =========================================================================
     // Block Sound Groups
-    // BlockSoundGroup(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound)
+    // SoundType(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound)
     // =========================================================================
 
-    public static final BlockSoundGroup DUCKLER_SOUND_GROUP = new BlockSoundGroup(
+    public static final SoundType DUCKLER_SOUND_GROUP = new SoundType(
             1.0f, 1.0f,
             DUCKLER_BREAK,
             DUCKLER_STEP,
@@ -112,7 +217,7 @@ public class ModSounds {
             DUCKLER_FALL
     );
 
-    public static final BlockSoundGroup PLUSH_SOUND_GROUP = new BlockSoundGroup(
+    public static final SoundType PLUSH_SOUND_GROUP = new SoundType(
             1.0f, 1.0f,
             PLUSH_BREAK,
             PLUSH_STEP,
@@ -120,7 +225,7 @@ public class ModSounds {
             PLUSH_HIT,
             PLUSH_FALL
     );
-    public static final BlockSoundGroup CYN_SOUND_GROUP = new BlockSoundGroup(
+    public static final SoundType CYN_SOUND_GROUP = new SoundType(
             1.0f, 1.0f,
             CYN_NOISE_11,
             PLUSH_STEP,
@@ -129,7 +234,7 @@ public class ModSounds {
             PLUSH_FALL
     );
 
-    public static final BlockSoundGroup TV_SOUND_GROUP = new BlockSoundGroup(
+    public static final SoundType TV_SOUND_GROUP = new SoundType(
             1.0f, 1.0f,
             TV_BREAK,
             TV_STEP,
@@ -143,8 +248,8 @@ public class ModSounds {
     // =========================================================================
 
     private static SoundEvent registerSoundEvent(String name) {
-        Identifier id = Identifier.of(Wots.MOD_ID, name);
-        return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+        Identifier id = Identifier.fromNamespaceAndPath(Wots.MOD_ID, name);
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 
     public static void registerModSounds() {

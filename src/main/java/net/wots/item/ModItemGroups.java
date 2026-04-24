@@ -1,36 +1,44 @@
 package net.wots.item;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.wots.Wots;
 import net.wots.block.ModBlocks;
 
 public class ModItemGroups {
-    public static final ItemGroup PLUSH_GROUP = Registry.register(Registries.ITEM_GROUP,
-            Identifier.of(Wots.MOD_ID, "plushies"),
-            FabricItemGroup.builder().icon(() -> new ItemStack(ModBlocks.UZI_PLUSH))
-                    .displayName(Text.translatable("itemgroup.wots.plushies"))
-                    .entries((displayContext, entries) -> {
-                        entries.add(ModBlocks.UZI_PLUSH);
-                        entries.add(ModBlocks.N_PLUSH);
-                        entries.add(ModBlocks.CUSTOM_STONECUTTER);
-                        entries.add(ModBlocks.PLUSHIE_SHELF);
-                        entries.add(ModBlocks.TRASH_BLOCK);
-                        entries.add(ModBlocks.UZI_HUGE);
-                        entries.add(ModBlocks.CYN_PLUSH);
-                        entries.add(ModBlocks.SIGMA_BLOCK);
-                        entries.add(ModBlocks.THE_DUCKLER);
-                        entries.add(ModBlocks.LUMINITE_BLOCK);
-                        // ── New in this update ───────────────────────────────
-                        entries.add(ModBlocks.SOLVER_BLOCK);
-                        entries.add(ModBlocks.COPPER_NINE_BLOCK);
-                        entries.add(ModItems.SOLVER_EYE);
-                        entries.add(ModBlocks.DOLL_PLUSH);
+    public static final CreativeModeTab PLUSH_GROUP = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
+            Identifier.fromNamespaceAndPath(Wots.MOD_ID, "plushies"),
+            FabricCreativeModeTab.builder().icon(() -> new ItemStack(ModBlocks.UZI_PLUSH))
+                    .title(Component.translatable("itemgroup.wots.plushies"))
+                    .displayItems((displayContext, entries) -> {
+                        entries.accept(ModBlocks.UZI_PLUSH);
+                        entries.accept(ModBlocks.N_PLUSH);
+                        entries.accept(ModBlocks.PLUSHIE_SHELF);
+                        entries.accept(ModBlocks.TRASH_BLOCK);
+                        entries.accept(ModBlocks.UZI_HUGE);
+                        entries.accept(ModBlocks.CYN_PLUSH);
+                        entries.accept(ModBlocks.SIGMA_BLOCK);
+                        entries.accept(ModBlocks.THE_DUCKLER);
+                        entries.accept(ModBlocks.LUMINITE_BLOCK);
+                        entries.accept(ModBlocks.PLUSHIE_PEDESTAL);
+                        entries.accept(ModBlocks.DOLL_PLUSH);
+                        entries.accept(ModBlocks.KINGER_PLUSH);
+                        entries.accept(ModBlocks.TESSA_PLUSH);
+                        entries.accept(ModBlocks.J_PLUSH);
+                        entries.accept(ModBlocks.LIZZY_PLUSH);
+                        entries.accept(ModBlocks.CAINE_PLUSH);
+                        entries.accept(ModBlocks.POMNI_PLUSH);
+                        entries.accept(ModBlocks.JAX_PLUSH);
+                        entries.accept(ModBlocks.RIBBIT_PLUSH);
+                        entries.accept(ModBlocks.CYN_PLUSH_MAID);
+                        entries.accept(ModBlocks.STEVE_PLUSH);
+                        entries.accept(ModBlocks.RGB_WOOL);
+                        entries.accept(ModBlocks.LAND_MINE);
                     }).build());
 
     public static void registerItemGroups() {

@@ -1,133 +1,99 @@
 package net.wots.block.plushies.cynplush;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.wots.util.VoxelShapeHelper;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.wots.block.ModBlocks;
 import net.wots.block.entity.CynPlushBlockEntity;
-import net.wots.block.plushies.PlushieSoundProvider;
+import net.wots.block.plushies.AbstractPlushieBlock;
 import net.wots.unlock.VariantUnlockManager;
 
-public class CynPlushBlock extends BlockWithEntity implements PlushieSoundProvider {
+public class CynPlushBlock extends AbstractPlushieBlock<CynPlushVariant> {
 
-    public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
-
-    private static final VoxelShape SHAPE_NORTH = makeShape();
-    private static final VoxelShape SHAPE_SOUTH = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 2);
-    private static final VoxelShape SHAPE_EAST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 1);
-    private static final VoxelShape SHAPE_WEST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 3);
-
-    private static VoxelShape makeShape() {
-        return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
-    }
-
-    public CynPlushBlock(Settings settings) {
-        super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+    public CynPlushBlock(Properties properties) {
+        super(properties, "wots:cyn_plush", "cyn",
+                CynPlushVariant.values(), CynPlushBlockEntity.SOUND_DURATIONS);
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return createCodec(CynPlushBlock::new);
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(CynPlushBlock::new);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-    }
-
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
-    }
-
-    @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
-    }
-
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CynPlushBlockEntity(pos, state);
     }
 
-//    // ── Ticker: drives the cluster hum every 5 seconds ───────────────────────
-//    @Override
-//    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-//        if (world.isClient) return null;
-//        if (type != ModBlocks.CYN_PLUSH_BLOCK_ENTITY) return null;
-//        //noinspection unchecked
-//        return (BlockEntityTicker<T>) (BlockEntityTicker<CynPlushBlockEntity>) CynPlushBlockEntity::tick;
-//    }
+    // ── Ticker: drives the solver particle system ────────────────────────────────
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return switch (state.get(FACING)) {
-            case SOUTH -> SHAPE_SOUTH;
-            case EAST  -> SHAPE_EAST;
-            case WEST  -> SHAPE_WEST;
-            default    -> SHAPE_NORTH;
-        };
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide()) return null;
+        if (type != ModBlocks.CYN_PLUSH_BLOCK_ENTITY) return null;
+        //noinspection unchecked
+        return (BlockEntityTicker<T>) (BlockEntityTicker<CynPlushBlockEntity>) CynPlushBlockEntity::tick;
+    }
+
+    // ── Overrides: CynPlushBlockEntity doesn't extend AbstractPlushieBlockEntity ─
+
+    @Override
+    protected void affectNeighborsAfterRemoval(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, boolean moved) {
+        // Note: in MC 26.1, affectNeighborsAfterRemoval no longer receives newState.
+        // Block entity may already be gone. Variant-preserving drops should use loot tables.
+        super.affectNeighborsAfterRemoval(state, level, pos, moved);
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return getOutlineShape(state, world, pos, ctx);
-    }
-
-    @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof CynPlushBlockEntity be) {
-            be.stopSound();
-            if (!world.isClient) {
-                Block.dropStack(world, pos, new ItemStack(state.getBlock().asItem()));
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state,
+                         LivingEntity placer, ItemStack stack) {
+        if (level.isClientSide()) return;
+        if (level.getBlockEntity(pos) instanceof CynPlushBlockEntity be) {
+            var beData = stack.get(DataComponents.CUSTOM_DATA);
+            if (beData != null) {
+                CompoundTag nbt = beData.copyTag();
+                if (nbt.contains("Variant")) {
+                    try { be.setVariant(CynPlushVariant.valueOf(nbt.getStringOr("Variant", ""))); }
+                    catch (IllegalArgumentException ignored) {}
+                }
             }
         }
-        super.onStateReplaced(state, world, pos, newState, moved);
-    }
-
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state,
-                         LivingEntity placer, ItemStack stack) {
-        super.onPlaced(world, pos, state, placer, stack);
-        // Cyn placed next to Uzi → triggers Uzi's OHNO unlock
-        if (!world.isClient && placer instanceof ServerPlayerEntity player) {
-            VariantUnlockManager.checkNeighborsForUziUnlocks((ServerWorld) world, pos, player);
+        if (placer instanceof ServerPlayer player) {
+            VariantUnlockManager.checkNeighborsForUziUnlocks((ServerLevel) level, pos, player);
         }
     }
 
+    // ── No variant wheel -- just play sound ───────────────────────────────────────
+
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
-                                 PlayerEntity player, BlockHitResult hit) {
-        onShelfInteract(world, pos, 0, player);
-        return ActionResult.SUCCESS;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                 Player player, BlockHitResult hit) {
+        onShelfInteract(level, pos, 0, player);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        if (!world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
+    public void onShelfInteract(Level level, BlockPos shelfPos, int slot, Player player) {
+        if (!level.isClientSide() && level.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
             be.playNextSound();
         }
-        if (world.isClient && world.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
+        if (level.isClientSide() && level.getBlockEntity(shelfPos) instanceof CynPlushBlockEntity be) {
             be.triggerAnim("controller", "bounce");
         }
     }

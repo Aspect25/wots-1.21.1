@@ -1,6 +1,8 @@
 package net.wots.block.plushies.uziplush;
 
-public enum UziPlushVariant {
+import net.wots.block.plushies.PlushieVariant;
+
+public enum UziPlushVariant implements PlushieVariant {
     UZI_PLUSH          ("Default",       0x9B8BB4),
     UZI_PLUSH_SADGE    ("Sadge",         0x6A8FBF),
     UZI_PLUSH_SCAREDAF ("Scared AF",     0xD4A843),
@@ -23,4 +25,7 @@ public enum UziPlushVariant {
         this.displayName = displayName;
         this.color = color;
     }
+
+    @Override public String displayName() { return displayName; }
+    @Override public int color() { return color; }
 }

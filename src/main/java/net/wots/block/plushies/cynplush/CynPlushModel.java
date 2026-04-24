@@ -1,27 +1,28 @@
 package net.wots.block.plushies.cynplush;
 
 
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.wots.block.entity.CynPlushBlockEntity;
-import net.wots.block.entity.UziPlushBlockEntity;
-import software.bernie.geckolib.model.GeoModel;
+import com.geckolib.model.GeoModel;
+import com.geckolib.renderer.base.GeoRenderState;
 
 public class CynPlushModel extends GeoModel<CynPlushBlockEntity> {
 
     @Override
-    public Identifier getModelResource(CynPlushBlockEntity entity) {
-        return Identifier.of("wots", "geo/cyn_plush.geo.json");
+    public Identifier getModelResource(GeoRenderState renderState) {
+        return Identifier.fromNamespaceAndPath("wots", "cyn_plush");
     }
 
     @Override
-    public Identifier getTextureResource(CynPlushBlockEntity entity) {
-        // Gets the block's registry name e.g. "uzi_plush_sadge"
-        String blockName = Registries.BLOCK.getId(entity.getCachedState().getBlock()).getPath();
-        return Identifier.of("wots", "textures/block/" + blockName + ".png");
+    public Identifier getTextureResource(GeoRenderState renderState) {
+        // TODO: In GeckoLib 5, need to get entity from GeoRenderState to look up block name.
+        // For now, return the default cyn_plush texture.
+        return Identifier.fromNamespaceAndPath("wots", "textures/block/cyn_plush.png");
     }
+
     @Override
     public Identifier getAnimationResource(CynPlushBlockEntity entity) {
-        return Identifier.of("wots", "animations/cyn_plush.animation.json");
+        return Identifier.fromNamespaceAndPath("wots", "cyn_plush");
     }
 }

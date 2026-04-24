@@ -1,6 +1,6 @@
 package net.wots.util;
 
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
 import java.util.*;
 
 /**
@@ -13,6 +13,7 @@ public class ShuffledSoundQueue {
     private final Map<SoundEvent, Integer> durations;
     private int index = 0;
     private SoundEvent lastPlayed = null;
+    private SoundEvent secondLastPlayed = null;
     private SoundEvent currentlyPlaying = null;
     private long cooldownEnd = 0L;
 
@@ -27,18 +28,35 @@ public class ShuffledSoundQueue {
         if (currentTime < cooldownEnd) return null;
 
         if (index == 0) {
-            Collections.shuffle(sounds);
-            if (sounds.size() > 1 && sounds.get(0).equals(lastPlayed)) {
-                Collections.swap(sounds, 0, 1);
-            }
+            reshuffle();
         }
 
         SoundEvent sound = sounds.get(index);
+        secondLastPlayed = lastPlayed;
         lastPlayed = sound;
         currentlyPlaying = sound;
         index = (index + 1) % sounds.size();
         cooldownEnd = currentTime + durations.get(sound);
         return sound;
+    }
+
+    /**
+     * Reshuffles the sound list, ensuring the first sound isn't the same
+     * as the last 1-2 played sounds. Prevents repetitive patterns.
+     */
+    private void reshuffle() {
+        if (sounds.size() <= 1) return;
+        for (int attempt = 0; attempt < 10; attempt++) {
+            Collections.shuffle(sounds);
+            SoundEvent first = sounds.get(0);
+            if (!first.equals(lastPlayed) && (sounds.size() <= 2 || !first.equals(secondLastPlayed))) {
+                return;
+            }
+        }
+        // Fallback: just swap the first element away from lastPlayed
+        if (sounds.get(0).equals(lastPlayed)) {
+            Collections.swap(sounds, 0, sounds.size() > 2 ? 2 : 1);
+        }
     }
 
     /** The sound that is currently playing (for stop-sound packets). */

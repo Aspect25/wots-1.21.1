@@ -1,101 +1,88 @@
 package net.wots.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.util.math.BlockPos;
-import org.joml.Vector3f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.wots.particle.ModParticles;
+import net.wots.particle.VariantParticleColor;
 
 import java.util.Random;
 
 /**
- * Spawns variant-change particle effects on the client.
- *
- * When a plushie's variant changes, a burst of colored dust particles
- * spirals outward from the block, using the variant's color.
+ * Spawns variant-change particle effects using dedicated Variant* particles.
+ * Color is set via VariantParticleColor before each addParticle call --
+ * the factory reads it at construction time, so it's baked into the particle.
  */
 public class VariantChangeParticles {
 
-    private static final Random RANDOM = new Random();
+    private static final Random RNG = new Random();
 
-    /**
-     * Spawn a burst of colored particles around a block position.
-     * Called when the client receives a VariantChangeParticlePayload.
-     *
-     * @param pos   Block position of the plushie
-     * @param color RGB color from the variant enum (e.g. 0xC94C4C)
-     */
     public static void spawnBurst(BlockPos pos, int color) {
-        ClientWorld world = MinecraftClient.getInstance().world;
+        ClientLevel world = Minecraft.getInstance().level;
         if (world == null) return;
+        ParticleEngine pm = Minecraft.getInstance().particleEngine;
 
         float r = ((color >> 16) & 0xFF) / 255f;
         float g = ((color >> 8) & 0xFF) / 255f;
         float b = (color & 0xFF) / 255f;
 
-        // Center of the block
-        double cx = pos.getX() + 0.5;
-        double cy = pos.getY() + 0.5;
-        double cz = pos.getZ() + 0.5;
+        double cx = pos.getX() + 0.5, cy = pos.getY() + 0.5, cz = pos.getZ() + 0.5;
 
-        // ── Ring burst — particles expand outward in a ring ──────────────────
-        int ringCount = 16;
-        for (int i = 0; i < ringCount; i++) {
-            double angle = (2 * Math.PI / ringCount) * i;
-            double radius = 0.3 + RANDOM.nextDouble() * 0.2;
+        // ── Ring pulse ───────────────────────────────────────────────────
+        VariantParticleColor.set(r, g, b);
+        pm.createParticle(ModParticles.VARIANT_RING, cx, cy, cz, 0, 0, 0);
 
-            double px = cx + Math.cos(angle) * radius;
-            double pz = cz + Math.sin(angle) * radius;
-            double py = cy + (RANDOM.nextDouble() - 0.5) * 0.4;
-
-            // Velocity: push outward + slight upward drift
-            double vx = Math.cos(angle) * 0.08 + (RANDOM.nextDouble() - 0.5) * 0.02;
-            double vy = 0.03 + RANDOM.nextDouble() * 0.04;
-            double vz = Math.sin(angle) * 0.08 + (RANDOM.nextDouble() - 0.5) * 0.02;
-
-            float size = 0.6f + RANDOM.nextFloat() * 0.4f;
-            DustParticleEffect dust = new DustParticleEffect(new Vector3f(r, g, b), size);
-            world.addParticle(dust, px, py, pz, vx, vy, vz);
+        // ── Core orbs ────────────────────────────────────────────────────
+        VariantParticleColor.set(
+                Math.min(1f, r * 1.2f + 0.15f),
+                Math.min(1f, g * 1.2f + 0.15f),
+                Math.min(1f, b * 1.2f + 0.15f));
+        for (int i = 0; i < 12; i++) {
+            double angle = (2 * Math.PI / 12) * i;
+            double rad = 0.25 + RNG.nextDouble() * 0.15;
+            pm.createParticle(ModParticles.VARIANT_CORE,
+                    cx + Math.cos(angle) * rad,
+                    cy + (RNG.nextDouble() - 0.5) * 0.4,
+                    cz + Math.sin(angle) * rad,
+                    Math.cos(angle) * 0.06, 0.02 + RNG.nextDouble() * 0.03, Math.sin(angle) * 0.06);
         }
 
-        // ── Upward spiral — a few particles drift up through the plushie ─────
-        int spiralCount = 8;
-        for (int i = 0; i < spiralCount; i++) {
-            double angle = (2 * Math.PI / spiralCount) * i + RANDOM.nextDouble() * 0.5;
-            double radius = 0.15 + RANDOM.nextDouble() * 0.1;
-
-            double px = cx + Math.cos(angle) * radius;
-            double pz = cz + Math.sin(angle) * radius;
-            double py = cy - 0.3 + (i / (double) spiralCount) * 0.8;
-
-            double vx = Math.cos(angle) * 0.01;
-            double vy = 0.05 + RANDOM.nextDouble() * 0.03;
-            double vz = Math.sin(angle) * 0.01;
-
-            float size = 0.4f + RANDOM.nextFloat() * 0.3f;
-            // Slightly brighter version of the color for the spiral
-            float br = Math.min(1f, r * 1.3f);
-            float bg = Math.min(1f, g * 1.3f);
-            float bb = Math.min(1f, b * 1.3f);
-            DustParticleEffect dust = new DustParticleEffect(new Vector3f(br, bg, bb), size);
-            world.addParticle(dust, px, py, pz, vx, vy, vz);
+        // ── Wisps ────────────────────────────────────────────────────────
+        VariantParticleColor.set(r * 0.7f, g * 0.5f, b * 0.8f);
+        for (int i = 0; i < 6; i++) {
+            double angle = (2 * Math.PI / 6) * i + RNG.nextDouble() * 0.5;
+            double rad = 0.15 + RNG.nextDouble() * 0.1;
+            pm.createParticle(ModParticles.VARIANT_WISP,
+                    cx + Math.cos(angle) * rad,
+                    cy - 0.2 + RNG.nextDouble() * 0.5,
+                    cz + Math.sin(angle) * rad,
+                    Math.cos(angle) * 0.003, 0.004, Math.sin(angle) * 0.003);
         }
 
-        // ── Sparkle pop — a handful of white particles for contrast ──────────
+        // ── Sparks ───────────────────────────────────────────────────────
+        VariantParticleColor.set(r, g, b);
+        for (int i = 0; i < 10; i++) {
+            double angle = RNG.nextDouble() * Math.PI * 2;
+            double speed = 0.04 + RNG.nextDouble() * 0.06;
+            pm.createParticle(ModParticles.VARIANT_SPARK,
+                    cx + (RNG.nextDouble() - 0.5) * 0.3,
+                    cy + (RNG.nextDouble() - 0.3) * 0.5,
+                    cz + (RNG.nextDouble() - 0.5) * 0.3,
+                    Math.cos(angle) * speed, 0.03 + RNG.nextDouble() * 0.05, Math.sin(angle) * speed);
+        }
+
+        // ── White sparkle pops ───────────────────────────────────────────
+        VariantParticleColor.set(
+                Math.min(1f, r * 0.3f + 0.7f),
+                Math.min(1f, g * 0.3f + 0.7f),
+                Math.min(1f, b * 0.3f + 0.7f));
         for (int i = 0; i < 5; i++) {
-            double px = cx + (RANDOM.nextDouble() - 0.5) * 0.6;
-            double py = cy + (RANDOM.nextDouble() - 0.5) * 0.8;
-            double pz = cz + (RANDOM.nextDouble() - 0.5) * 0.6;
-            double vx = (RANDOM.nextDouble() - 0.5) * 0.05;
-            double vy = 0.02 + RANDOM.nextDouble() * 0.05;
-            double vz = (RANDOM.nextDouble() - 0.5) * 0.05;
-
-            // Mix white with the variant color for sparkle
-            float wr = Math.min(1f, r * 0.5f + 0.5f);
-            float wg = Math.min(1f, g * 0.5f + 0.5f);
-            float wb = Math.min(1f, b * 0.5f + 0.5f);
-            DustParticleEffect dust = new DustParticleEffect(new Vector3f(wr, wg, wb), 0.3f);
-            world.addParticle(dust, px, py, pz, vx, vy, vz);
+            pm.createParticle(ModParticles.VARIANT_SPARK,
+                    cx + (RNG.nextDouble() - 0.5) * 0.5,
+                    cy + (RNG.nextDouble() - 0.5) * 0.7,
+                    cz + (RNG.nextDouble() - 0.5) * 0.5,
+                    (RNG.nextDouble() - 0.5) * 0.04, 0.02 + RNG.nextDouble() * 0.04, (RNG.nextDouble() - 0.5) * 0.04);
         }
     }
 }

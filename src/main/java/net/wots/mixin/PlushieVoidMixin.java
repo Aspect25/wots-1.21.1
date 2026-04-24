@@ -1,11 +1,11 @@
 package net.wots.mixin;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.wots.block.ModBlocks;
 import net.wots.unlock.VariantUnlockManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,28 +23,31 @@ public abstract class PlushieVoidMixin {
     @Inject(method = "tick", at = @At("HEAD"))
     private void wots$checkVoidFall(CallbackInfo ci) {
         ItemEntity self = (ItemEntity) (Object) this;
-        if (self.getWorld().isClient) return;
+        if (self.level().isClientSide()) return;
         if (!self.isAlive()) return;
 
         // Check if below world bottom
-        if (self.getY() < self.getWorld().getBottomY() - 32) {
-            Item item = self.getStack().getItem();
+        if (self.getY() < self.level().getMinY() - 32) {
+            Item item = self.getItem().getItem();
 
             String character = null;
             if (item == ModBlocks.N_PLUSH.asItem()) character = "n";
             else if (item == ModBlocks.UZI_PLUSH.asItem()) character = "uzi";
+            else if (item == ModBlocks.DOLL_PLUSH.asItem()) character = "doll";
+            else if (item == ModBlocks.CYN_PLUSH.asItem()) character = "cyn";
+            else if (item == ModBlocks.LIZZY_PLUSH.asItem()) character = "lizzy";
 
-            if (character != null && self.getWorld() instanceof ServerWorld serverWorld) {
+            if (character != null && self.level() instanceof ServerLevel serverWorld) {
                 // Find the thrower/owner
                 Entity owner = self.getOwner();
-                if (owner instanceof ServerPlayerEntity player) {
+                if (owner instanceof ServerPlayer player) {
                     VariantUnlockManager.onPlushieDroppedInVoid(player, character);
                 } else {
                     // Fallback: find nearest player within 64 blocks
-                    PlayerEntity closest = serverWorld.getClosestPlayer(
+                    Player closest = serverWorld.getNearestPlayer(
                             self.getX(), self.getY() + 64, self.getZ(), 64, false
                     );
-                    if (closest instanceof ServerPlayerEntity serverPlayer) {
+                    if (closest instanceof ServerPlayer serverPlayer) {
                         VariantUnlockManager.onPlushieDroppedInVoid(serverPlayer, character);
                     }
                 }

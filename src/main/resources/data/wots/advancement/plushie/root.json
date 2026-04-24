@@ -11,7 +11,17 @@
     "criteria": {
         "place_n": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:n_plush" }] } },
         "place_uzi": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:uzi_plush" }] } },
-        "place_cyn": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:cyn_plush" }] } }
+        "place_cyn": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:cyn_plush" }] } },
+        "place_doll": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:doll_plush" }] } },
+        "place_j": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:j_plush" }] } },
+        "place_kinger": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:kinger_plush" }] } },
+        "place_tessa": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:tessa_plush" }] } },
+        "place_lizzy": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:lizzy_plush" }] } },
+        "place_caine": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:caine_plush" }] } },
+        "place_ribbit": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:ribbit_plush" }] } },
+        "place_cyn_maid": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:cyn_plush_maid" }] } },
+        "place_sigma": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:sigma_block" }] } },
+        "place_the_duckler": { "trigger": "minecraft:placed_block", "conditions": { "location": [{ "condition": "minecraft:block_state_property", "block": "wots:the_duckler" }] } }
     },
-    "requirements": [["place_n", "place_uzi", "place_cyn"]]
+    "requirements": [["place_n", "place_uzi", "place_cyn", "place_doll", "place_j", "place_kinger", "place_tessa", "place_lizzy", "place_caine", "place_ribbit", "place_cyn_maid", "place_sigma", "place_the_duckler"]]
 }

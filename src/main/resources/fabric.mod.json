@@ -2,8 +2,8 @@
 	"schemaVersion": 1,
 	"id": "wots",
 	"version": "${version}",
-	"name": "Wots",
-	"description": "Da plushie mod",
+	"name": "Squishables",
+	"description": "Squeezable plushies, secret expressions, and chaotic fun!",
 	"authors": [
 		"FervantPlate"
 	],
@@ -30,10 +30,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.18.4",
-		"minecraft": "~1.21.1",
-		"java": ">=21",
-		"fabric-api": "*",
-		"accessories": "*",
-		"owo": "*"
+		"minecraft": "~26.1.2",
+		"java": ">=25",
+		"fabric-api": "*"
 	}
 }

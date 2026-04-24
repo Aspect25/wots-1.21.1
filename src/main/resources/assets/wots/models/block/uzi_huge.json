@@ -1,5 +1,5 @@
 {
   "ambientocclusion": false,
-  "textures": {},
+  "textures": {"particle":"wots:block/custom/red"},
   "elements": []
 }

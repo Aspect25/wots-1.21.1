@@ -1,139 +1,206 @@
 package net.wots.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.wots.block.ModBlocks;
 import net.wots.block.plushies.uziplush.UziPlushVariant;
 import net.wots.sound.ModSounds;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.util.GeckoLibUtil;
-
-import java.util.*;
 import net.wots.util.ShuffledSoundQueue;
 
-public class UziPlushBlockEntity extends BlockEntity implements GeoBlockEntity {
+import java.util.*;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-
-    // ── Variant ───────────────────────────────────────────────────────────────
-    private UziPlushVariant variant = UziPlushVariant.UZI_PLUSH;
+/**
+ * Uzi plushie block entity -- extends the base with per-variant sound maps
+ * and redstone state tracking.
+ */
+public class UziPlushBlockEntity extends AbstractPlushieBlockEntity<UziPlushVariant> {
 
     // ── Redstone state ────────────────────────────────────────────────────────
-    // Persisted so we correctly detect rising edge after chunk reload.
     private boolean wasPowered = false;
 
-    public UziPlushVariant getVariant() { return variant; }
     public boolean wasPowered() { return wasPowered; }
-
-    public void setVariant(UziPlushVariant variant) {
-        this.variant = variant;
-        markDirty();
-        if (world instanceof ServerWorld sw) {
-            sw.updateListeners(pos, getCachedState(), getCachedState(), 3);
-        }
-    }
 
     public void setWasPowered(boolean powered) {
         if (this.wasPowered != powered) {
             this.wasPowered = powered;
-            markDirty();
+            setChanged();
         }
     }
 
-    // ── Sound ─────────────────────────────────────────────────────────────────
-    public static final Map<SoundEvent, Integer> SOUND_DURATIONS = Map.ofEntries(
-            Map.entry(ModSounds.UZI_NOISE,   80),
-            Map.entry(ModSounds.UZI_NOISE_2, 20),
-            Map.entry(ModSounds.UZI_NOISE_3, 40),
-            Map.entry(ModSounds.UZI_NOISE_4, 40),
-            Map.entry(ModSounds.UZI_NOISE_5, 60),
-            Map.entry(ModSounds.UZI_NOISE_6, 60),
-            Map.entry(ModSounds.UZI_NOISE_7, 80)
+    // ── Sound durations per variant ───────────────────────────────────────────
+
+    /** Default expression -- 10 voice lines. */
+    public static final Map<SoundEvent, Integer> DEFAULT_SOUNDS = Map.ofEntries(
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_1,  115),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_2,  175),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_3,  165),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_4,  108),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_5,  125),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_6,  190),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_7,  166),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_8,  119),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_9,  190),
+            Map.entry(ModSounds.UZI_PLUSH_DEFAULT_10, 138)
     );
 
-    private final ShuffledSoundQueue soundQueue;
+    /** Maps every variant to its sound-duration table. */
+    public static final Map<UziPlushVariant, Map<SoundEvent, Integer>> VARIANT_SOUND_MAP;
+
+    static {
+        Map<UziPlushVariant, Map<SoundEvent, Integer>> m = new EnumMap<>(UziPlushVariant.class);
+
+        m.put(UziPlushVariant.UZI_PLUSH, DEFAULT_SOUNDS);
+
+        m.put(UziPlushVariant.UZI_PLUSH_SADGE, Map.of(
+                ModSounds.UZI_PLUSH_SADGE_1, 164,
+                ModSounds.UZI_PLUSH_SADGE_2, 192,
+                ModSounds.UZI_PLUSH_SADGE_3, 152
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_SCAREDAF, Map.of(
+                ModSounds.UZI_PLUSH_SCAREDAF_1, 151,
+                ModSounds.UZI_PLUSH_SCAREDAF_2, 141,
+                ModSounds.UZI_PLUSH_SCAREDAF_3, 152
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_SPOOKED, Map.of(
+                ModSounds.UZI_PLUSH_SPOOKED_1, 125,
+                ModSounds.UZI_PLUSH_SPOOKED_2,  95,
+                ModSounds.UZI_PLUSH_SPOOKED_3, 150
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_TRAUMATIZED, Map.of(
+                ModSounds.UZI_PLUSH_TRAUMATIZED_1, 132,
+                ModSounds.UZI_PLUSH_TRAUMATIZED_2, 159,
+                ModSounds.UZI_PLUSH_TRAUMATIZED_3,  94
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_UNAMUSED, Map.of(
+                ModSounds.UZI_PLUSH_UNAMUSED_1, 144,
+                ModSounds.UZI_PLUSH_UNAMUSED_2, 117,
+                ModSounds.UZI_PLUSH_UNAMUSED_3, 120
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_ANGY, Map.of(
+                ModSounds.UZI_PLUSH_ANGY_1, 142,
+                ModSounds.UZI_PLUSH_ANGY_2, 168,
+                ModSounds.UZI_PLUSH_ANGY_3, 143
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_ANGYAF, Map.of(
+                ModSounds.UZI_PLUSH_ANGYAF_1,  92,
+                ModSounds.UZI_PLUSH_ANGYAF_2, 126,
+                ModSounds.UZI_PLUSH_ANGYAF_3, 108
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_DRUNK, Map.of(
+                ModSounds.UZI_PLUSH_DRUNK_1, 279,
+                ModSounds.UZI_PLUSH_DRUNK_2, 267,
+                ModSounds.UZI_PLUSH_DRUNK_3, 315,
+                ModSounds.UZI_PLUSH_DRUNK_4, 277,
+                ModSounds.UZI_PLUSH_DRUNK_5, 250
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_HAPPY, Map.of(
+                ModSounds.UZI_PLUSH_HAPPY_1, 130,
+                ModSounds.UZI_PLUSH_HAPPY_2, 124,
+                ModSounds.UZI_PLUSH_HAPPY_3, 152
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_WORRIEDAF, Map.of(
+                ModSounds.UZI_PLUSH_WORRIEDAF_1, 135,
+                ModSounds.UZI_PLUSH_WORRIEDAF_2, 140,
+                ModSounds.UZI_PLUSH_WORRIEDAF_3, 119
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_WORRIED, Map.of(
+                ModSounds.UZI_PLUSH_WORRIED_1, 139,
+                ModSounds.UZI_PLUSH_WORRIED_2, 130,
+                ModSounds.UZI_PLUSH_WORRIED_3, 126
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_OHNO, Map.of(
+                ModSounds.UZI_PLUSH_OHNO_1, 161,
+                ModSounds.UZI_PLUSH_OHNO_2, 164,
+                ModSounds.UZI_PLUSH_OHNO_3,  62
+        ));
+
+        m.put(UziPlushVariant.UZI_PLUSH_SMIRK, Map.of(
+                ModSounds.UZI_PLUSH_SMIRK_1, 115,
+                ModSounds.UZI_PLUSH_SMIRK_2, 136,
+                ModSounds.UZI_PLUSH_SMIRK_3, 134
+        ));
+
+        VARIANT_SOUND_MAP = Collections.unmodifiableMap(m);
+    }
+
+    /** Shelf interactions use the default variant queue when variant is unknown. */
+    public static final Map<SoundEvent, Integer> SOUND_DURATIONS = DEFAULT_SOUNDS;
+
+    // ── Per-variant sound queues (lazily created) ─────────────────────────────
+    private final Map<UziPlushVariant, ShuffledSoundQueue> variantQueues = new EnumMap<>(UziPlushVariant.class);
+    private SoundEvent lastPlayedSound = null;
 
     public UziPlushBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlocks.UZI_PLUSH_BLOCK_ENTITY, pos, state);
-        soundQueue = new ShuffledSoundQueue(SOUND_DURATIONS);
+        super(ModBlocks.UZI_PLUSH_BLOCK_ENTITY, pos, state,
+                UziPlushVariant.UZI_PLUSH, UziPlushVariant.class, DEFAULT_SOUNDS);
     }
 
+    /** Returns (or creates) the shuffled queue for the given variant. */
+    private ShuffledSoundQueue queueFor(UziPlushVariant v) {
+        return variantQueues.computeIfAbsent(v, k -> {
+            Map<SoundEvent, Integer> durations = VARIANT_SOUND_MAP.get(k);
+            if (durations == null) durations = DEFAULT_SOUNDS;
+            return new ShuffledSoundQueue(durations);
+        });
+    }
+
+    @Override
     public void playNextSound() {
-        if (world == null || world.isClient) return;
-        SoundEvent sound = soundQueue.tryAdvance(world.getTime());
+        if (level == null || level.isClientSide()) return;
+        ShuffledSoundQueue queue = queueFor(getVariant());
+        SoundEvent sound = queue.tryAdvance(level.getGameTime());
         if (sound != null) {
-            world.playSound(null, pos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            lastPlayedSound = sound;
+            level.playSound(null, getBlockPos(), sound, SoundSource.BLOCKS, 1.0f, 1.0f);
         }
     }
 
+    @Override
     public void stopSound() {
-        if (world == null || world.isClient) return;
-        SoundEvent current = soundQueue.getCurrentlyPlaying();
+        if (level == null || level.isClientSide()) return;
+        SoundEvent current = queueFor(getVariant()).getCurrentlyPlaying();
+        if (current == null) current = lastPlayedSound;
         if (current == null) return;
-        StopSoundS2CPacket packet = new StopSoundS2CPacket(current.getId(), SoundCategory.BLOCKS);
-        ((ServerWorld) world).getPlayers(
-                player -> player.squaredDistanceTo(Vec3d.ofCenter(pos)) < 64 * 64
-        ).forEach(player -> ((ServerPlayerEntity) player).networkHandler.sendPacket(packet));
-        soundQueue.clearCurrent();
+
+        ClientboundStopSoundPacket packet =
+                new ClientboundStopSoundPacket(current.location(), SoundSource.BLOCKS);
+        ((ServerLevel) level).getPlayers(
+                player -> player.distanceToSqr(Vec3.atCenterOf(getBlockPos())) < 64 * 64
+        ).forEach(player -> player.connection.send(packet));
+        queueFor(getVariant()).clearCurrent();
+        lastPlayedSound = null;
     }
 
-    // ── NBT ───────────────────────────────────────────────────────────────────
-    @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.writeNbt(nbt, registryLookup);
-        nbt.putString("Variant", variant.name());
-        nbt.putBoolean("WasPowered", wasPowered);
-    }
+    // ── NBT (extends base with wasPowered) ────────────────────────────────────
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        super.readNbt(nbt, registryLookup);
-        try {
-            variant = UziPlushVariant.valueOf(nbt.getString("Variant"));
-        } catch (IllegalArgumentException e) {
-            variant = UziPlushVariant.UZI_PLUSH;
-        }
-        wasPowered = nbt.getBoolean("WasPowered");
-    }
-
-    // ── Sync ──────────────────────────────────────────────────────────────────
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
+        output.putBoolean("WasPowered", wasPowered);
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
-        return createNbt(registryLookup);
-    }
-
-    // ── GeckoLib ──────────────────────────────────────────────────────────────
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(
-                new AnimationController<>(this, "controller", 2, state -> PlayState.STOP)
-                        .triggerableAnim("bounce", RawAnimation.begin()
-                                .then("squeesh", Animation.LoopType.PLAY_ONCE))
-        );
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        wasPowered = input.getBooleanOr("WasPowered", false);
     }
 }

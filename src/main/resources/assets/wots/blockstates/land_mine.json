@@ -1,19 +1,12 @@
 {
   "variants": {
-    "facing=east": {
-      "model": "wots:block/land_mine",
-      "y": 90
-    },
-    "facing=north": {
-      "model": "wots:block/land_mine"
-    },
-    "facing=south": {
-      "model": "wots:block/land_mine",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "wots:block/land_mine",
-      "y": 270
-    }
+    "facing=north,triggered=false": { "model": "wots:block/land_mine" },
+    "facing=north,triggered=true":  { "model": "wots:block/land_mine" },
+    "facing=south,triggered=false": { "model": "wots:block/land_mine", "y": 180 },
+    "facing=south,triggered=true":  { "model": "wots:block/land_mine", "y": 180 },
+    "facing=east,triggered=false":  { "model": "wots:block/land_mine", "y": 90 },
+    "facing=east,triggered=true":   { "model": "wots:block/land_mine", "y": 90 },
+    "facing=west,triggered=false":  { "model": "wots:block/land_mine", "y": 270 },
+    "facing=west,triggered=true":   { "model": "wots:block/land_mine", "y": 270 }
   }
 }

@@ -11,7 +11,20 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "wots:uzi_huge"
+          "name": "wots:uzi_huge",
+          "functions": [
+            {
+              "function": "minecraft:copy_custom_data",
+              "source": "block_entity",
+              "ops": [
+                {
+                  "source": "Variant",
+                  "target": "Variant",
+                  "op": "replace"
+                }
+              ]
+            }
+          ]
         }
       ],
       "rolls": 1.0

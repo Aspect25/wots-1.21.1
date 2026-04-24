@@ -1,47 +1,47 @@
 package net.wots.network;
 
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Server → Client payload that syncs which variants a player has unlocked.
+ * Server -> Client payload that syncs which variants a player has unlocked.
  */
-public record SyncVariantUnlocksPayload(Set<String> unlocks) implements CustomPayload {
+public record SyncVariantUnlocksPayload(Set<String> unlocks) implements CustomPacketPayload {
 
-    public static final Id<SyncVariantUnlocksPayload> ID =
-            new Id<>(Identifier.of("wots", "sync_variant_unlocks"));
+    public static final Type<SyncVariantUnlocksPayload> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath("wots", "sync_variant_unlocks"));
 
-    public static final PacketCodec<RegistryByteBuf, SyncVariantUnlocksPayload> CODEC =
-            new PacketCodec<>() {
+    public static final StreamCodec<RegistryFriendlyByteBuf, SyncVariantUnlocksPayload> CODEC =
+            new StreamCodec<>() {
                 @Override
-                public SyncVariantUnlocksPayload decode(RegistryByteBuf buf) {
+                public SyncVariantUnlocksPayload decode(RegistryFriendlyByteBuf buf) {
                     int count = buf.readVarInt();
                     Set<String> set = new HashSet<>();
                     for (int i = 0; i < count; i++) {
-                        set.add(buf.readString());
+                        set.add(buf.readUtf());
                     }
                     return new SyncVariantUnlocksPayload(set);
                 }
 
                 @Override
-                public void encode(RegistryByteBuf buf, SyncVariantUnlocksPayload payload) {
+                public void encode(RegistryFriendlyByteBuf buf, SyncVariantUnlocksPayload payload) {
                     buf.writeVarInt(payload.unlocks().size());
                     for (String s : payload.unlocks()) {
-                        buf.writeString(s);
+                        buf.writeUtf(s);
                     }
                 }
             };
 
     @Override
-    public Id<? extends CustomPayload> getId() { return ID; }
+    public Type<? extends CustomPacketPayload> type() { return TYPE; }
 
     public static void register() {
-        PayloadTypeRegistry.playS2C().register(ID, CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(TYPE, CODEC);
     }
 }

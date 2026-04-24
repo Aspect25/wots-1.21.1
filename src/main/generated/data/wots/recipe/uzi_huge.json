@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "U": {
-      "item": "wots:uzi_plush"
-    }
+    "U": "wots:uzi_plush"
   },
   "pattern": [
     "UUU",

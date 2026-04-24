@@ -1,15 +1,14 @@
 package net.wots.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.BlockPos;
 import net.wots.block.ModBlocks;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,9 +17,12 @@ public class PlushieShelfBlockEntity extends BlockEntity {
     public static final int SLOTS = 5;
     private final ItemStack[] plushies = new ItemStack[SLOTS];
 
+    private static final int BOUNCE_COOLDOWN_TICKS = 20;
+    private final long[] lastBounceTicks = new long[SLOTS];
+
     // ── Transient bounce trigger (not saved to world, only sent in update packets) ──
-    // Set to the slot index before calling world.updateListeners(), then reset to -1.
-    // The client reads this in readNbt() and triggers the GeckoLib anim on the proxy.
+    // Set to the slot index before calling level.sendBlockUpdated(), then reset to -1.
+    // The client reads this in loadAdditional() and triggers the GeckoLib anim on the proxy.
     private int bounceSlot = -1;
 
     // ── Client-side animation proxies ─────────────────────────────────────────
@@ -37,7 +39,7 @@ public class PlushieShelfBlockEntity extends BlockEntity {
             animProxies = new NPlushBlockEntity[SLOTS];
             for (int i = 0; i < SLOTS; i++) {
                 // Constructed without a world - GeckoLib only needs the cache, not the world.
-                animProxies[i] = new NPlushBlockEntity(pos, getCachedState());
+                animProxies[i] = new NPlushBlockEntity(getBlockPos(), getBlockState());
             }
         }
         return animProxies[slot];
@@ -82,11 +84,14 @@ public class PlushieShelfBlockEntity extends BlockEntity {
      * trigger the GeckoLib "bounce" animation on the correct proxy.
      */
     public void triggerBounce(int slot) {
-        if (world == null || world.isClient) return;
+        if (level == null || level.isClientSide()) return;
+        long now = level.getGameTime();
+        if (now - lastBounceTicks[slot] < BOUNCE_COOLDOWN_TICKS) return;
+        lastBounceTicks[slot] = now;
         bounceSlot = slot;
-        // updateListeners creates the packet synchronously (calls toUpdatePacket ->
-        // createNbt -> writeNbt) while bounceSlot is still set.
-        world.updateListeners(pos, getCachedState(), getCachedState(), 3);
+        // sendBlockUpdated creates the packet synchronously (calls getUpdatePacket ->
+        // saveWithFullMetadata -> saveAdditional) while bounceSlot is still set.
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         // Reset immediately so world-save NBT never persists a stale slot number.
         bounceSlot = -1;
     }
@@ -95,68 +100,47 @@ public class PlushieShelfBlockEntity extends BlockEntity {
 
     /** Marks dirty AND pushes update packet to all nearby clients. */
     private void sync() {
-        markDirty();
-        if (world != null && !world.isClient) {
-            world.updateListeners(pos, getCachedState(), getCachedState(), 3);
+        setChanged();
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     }
 
     @Nullable
     @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registries) {
-        return createNbt(registries);
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithFullMetadata(registries);
     }
 
     // ── NBT ───────────────────────────────────────────────────────────────────
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.writeNbt(nbt, registries);
-
-        // Plushie item stacks (always written for save + sync)
-        NbtList list = new NbtList();
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput output) {
+        super.saveAdditional(output);
         for (int i = 0; i < SLOTS; i++) {
-            NbtCompound entry = new NbtCompound();
-            entry.putInt("slot", i);
-            if (!plushies[i].isEmpty())
-                entry.put("item", plushies[i].encode(registries));
-            list.add(entry);
+            if (!plushies[i].isEmpty()) {
+                output.storeNullable("Slot" + i, ItemStack.CODEC, plushies[i]);
+            }
         }
-        nbt.put("plushies", list);
-
-        // Bounce trigger (only written when a bounce is pending; -1 is the default
-        // so we omit it from world saves to keep NBT clean)
         if (bounceSlot >= 0) {
-            nbt.putInt("bounceSlot", bounceSlot);
+            output.putInt("bounceSlot", bounceSlot);
         }
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        super.readNbt(nbt, registries);
-
-        // Plushies
-        for (int i = 0; i < SLOTS; i++) plushies[i] = ItemStack.EMPTY;
-        NbtList list = nbt.getList("plushies", NbtCompound.COMPOUND_TYPE);
-        for (int i = 0; i < list.size(); i++) {
-            NbtCompound entry = list.getCompound(i);
-            int slot = entry.getInt("slot");
-            if (slot >= 0 && slot < SLOTS && entry.contains("item"))
-                plushies[slot] = ItemStack.fromNbtOrEmpty(registries, entry.getCompound("item"));
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput input) {
+        super.loadAdditional(input);
+        for (int i = 0; i < SLOTS; i++) {
+            plushies[i] = input.read("Slot" + i, ItemStack.CODEC).orElse(ItemStack.EMPTY);
         }
-
-        // Bounce trigger — only present in update packets, never in world-save data.
-        // On the client, fire the GeckoLib animation on the correct proxy.
-        if (nbt.contains("bounceSlot")) {
-            int slot = nbt.getInt("bounceSlot");
-            if (world != null && world.isClient && slot >= 0 && slot < SLOTS) {
-                getAnimProxy(slot).triggerAnim("controller", "bounce");
-            }
+        int slot = input.getIntOr("bounceSlot", -1);
+        if (level != null && level.isClientSide() && slot >= 0 && slot < SLOTS) {
+            getAnimProxy(slot).triggerAnim("controller", "bounce");
         }
     }
 }

@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "X": {
-      "item": "minecraft:cobbled_deepslate_slab"
-    }
+    "X": "minecraft:cobbled_deepslate_slab"
   },
   "pattern": [
     "XXX"

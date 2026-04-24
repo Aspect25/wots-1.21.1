@@ -1,14 +1,17 @@
 package net.wots.block.entity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
 import net.wots.block.ModBlocks;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animation.*;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.object.LoopType;
+import com.geckolib.util.GeckoLibUtil;
 
 public class SigmaBlockEntity extends BlockEntity implements GeoBlockEntity {
 
@@ -21,9 +24,9 @@ public class SigmaBlockEntity extends BlockEntity implements GeoBlockEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(
-                new AnimationController<>(this, "controller", 2, state -> PlayState.STOP)
+                new AnimationController<>("controller", 2, state -> PlayState.STOP)
                         .triggerableAnim("bounce", RawAnimation.begin()
-                                .then("squeesh", Animation.LoopType.PLAY_ONCE))
+                                .then("squeesh", LoopType.PLAY_ONCE))
         );
     }
 

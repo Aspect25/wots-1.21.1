@@ -1,262 +1,809 @@
 {
   "j_noise": {
     "subtitle": "sound.wots.j_noise",
-    "sounds": ["wots:j_noise"]
+    "sounds": [
+      "wots:j_noise"
+    ]
   },
   "cyn_noise_1": {
     "subtitle": "sound.wots.cyn_noise_1",
-    "sounds": ["wots:cyn_noise_1"]
+    "sounds": [
+      "wots:cyn_noise_1"
+    ]
   },
   "cyn_noise_2": {
     "subtitle": "sound.wots.cyn_noise_2",
-    "sounds": ["wots:cyn_noise_2"]
+    "sounds": [
+      "wots:cyn_noise_2"
+    ]
   },
   "cyn_noise_3": {
     "subtitle": "sound.wots.cyn_noise_3",
-    "sounds": ["wots:cyn_noise_3"]
+    "sounds": [
+      "wots:cyn_noise_3"
+    ]
   },
   "cyn_noise_4": {
     "subtitle": "sound.wots.cyn_noise_4",
-    "sounds": ["wots:cyn_noise_4"]
+    "sounds": [
+      "wots:cyn_noise_4"
+    ]
   },
   "cyn_noise_5": {
     "subtitle": "sound.wots.cyn_noise_5",
-    "sounds": ["wots:cyn_noise_5"]
+    "sounds": [
+      "wots:cyn_noise_5"
+    ]
   },
   "cyn_noise_6": {
     "subtitle": "sound.wots.cyn_noise_6",
-    "sounds": ["wots:cyn_noise_6"]
+    "sounds": [
+      "wots:cyn_noise_6"
+    ]
   },
   "cyn_noise_7": {
     "subtitle": "sound.wots.cyn_noise_7",
-    "sounds": ["wots:cyn_noise_7"]
+    "sounds": [
+      "wots:cyn_noise_7"
+    ]
   },
   "cyn_noise_8": {
     "subtitle": "sound.wots.cyn_noise_8",
-    "sounds": ["wots:cyn_noise_8"]
+    "sounds": [
+      "wots:cyn_noise_8"
+    ]
   },
   "cyn_noise_9": {
     "subtitle": "sound.wots.cyn_noise_9",
-    "sounds": ["wots:cyn_noise_9"]
+    "sounds": [
+      "wots:cyn_noise_9"
+    ]
   },
   "cyn_noise_10": {
     "subtitle": "sound.wots.cyn_noise_10",
-    "sounds": ["wots:cyn_noise_10"]
+    "sounds": [
+      "wots:cyn_noise_10"
+    ]
   },
   "cyn_noise_11": {
     "subtitle": "sound.wots.cyn_noise_11",
-    "sounds": ["wots:cyn_noise_11"]
+    "sounds": [
+      "wots:cyn_noise_11"
+    ]
   },
   "fatass_noise": {
     "subtitle": "sound.wots.fatass_noise",
-    "sounds": ["wots:fatass_noise"]
+    "sounds": [
+      "wots:fatass_noise"
+    ]
   },
   "uzi_noise": {
     "subtitle": "sound.wots.uzi_noise",
-    "sounds": ["wots:uzi_noise"]
+    "sounds": [
+      "wots:uzi_noise"
+    ]
   },
   "uzi_noise_2": {
     "subtitle": "sound.wots.uzi_noise_2",
-    "sounds": ["wots:uzi_noise_2"]
+    "sounds": [
+      "wots:uzi_noise_2"
+    ]
   },
   "uzi_noise_3": {
     "subtitle": "sound.wots.uzi_noise_3",
-    "sounds": ["wots:uzi_noise_3"]
+    "sounds": [
+      "wots:uzi_noise_3"
+    ]
   },
   "uzi_noise_4": {
     "subtitle": "sound.wots.uzi_noise_4",
-    "sounds": ["wots:uzi_noise_4"]
+    "sounds": [
+      "wots:uzi_noise_4"
+    ]
   },
   "uzi_noise_5": {
     "subtitle": "sound.wots.uzi_noise_5",
-    "sounds": ["wots:uzi_noise_5"]
+    "sounds": [
+      "wots:uzi_noise_5"
+    ]
   },
   "uzi_noise_6": {
     "subtitle": "sound.wots.uzi_noise_6",
-    "sounds": ["wots:uzi_noise_6"]
+    "sounds": [
+      "wots:uzi_noise_6"
+    ]
   },
   "uzi_noise_7": {
     "subtitle": "sound.wots.uzi_noise_7",
-    "sounds": ["wots:uzi_noise_7"]
+    "sounds": [
+      "wots:uzi_noise_7"
+    ]
   },
   "n_noise_1": {
     "subtitle": "sound.wots.n_noise_1",
-    "sounds": ["wots:n_noise_1"]
+    "sounds": [
+      "wots:n_noise_1"
+    ]
   },
   "n_noise_2": {
     "subtitle": "sound.wots.n_noise_2",
-    "sounds": ["wots:n_noise_2"]
+    "sounds": [
+      "wots:n_noise_2"
+    ]
   },
   "n_noise_3": {
     "subtitle": "sound.wots.n_noise_3",
-    "sounds": ["wots:n_noise_3"]
+    "sounds": [
+      "wots:n_noise_3"
+    ]
   },
   "n_noise_4": {
     "subtitle": "sound.wots.n_noise_4",
-    "sounds": ["wots:n_noise_4"]
+    "sounds": [
+      "wots:n_noise_4"
+    ]
   },
   "n_noise_5": {
     "subtitle": "sound.wots.n_noise_5",
-    "sounds": ["wots:n_noise_5"]
+    "sounds": [
+      "wots:n_noise_5"
+    ]
   },
   "n_noise_6": {
     "subtitle": "sound.wots.n_noise_6",
-    "sounds": ["wots:n_noise_6"]
+    "sounds": [
+      "wots:n_noise_6"
+    ]
   },
   "n_noise_7": {
     "subtitle": "sound.wots.n_noise_7",
-    "sounds": ["wots:n_noise_7"]
+    "sounds": [
+      "wots:n_noise_7"
+    ]
   },
   "n_noise_8": {
     "subtitle": "sound.wots.n_noise_8",
-    "sounds": ["wots:n_noise_8"]
+    "sounds": [
+      "wots:n_noise_8"
+    ]
   },
   "n_noise_9": {
     "subtitle": "sound.wots.n_noise_9",
-    "sounds": ["wots:n_noise_9"]
+    "sounds": [
+      "wots:n_noise_9"
+    ]
   },
   "n_noise_10": {
     "subtitle": "sound.wots.n_noise_10",
-    "sounds": ["wots:n_noise_10"]
+    "sounds": [
+      "wots:n_noise_10"
+    ]
   },
   "n_noise_11": {
     "subtitle": "sound.wots.n_noise_11",
-    "sounds": ["wots:n_noise_11"]
+    "sounds": [
+      "wots:n_noise_11"
+    ]
   },
   "n_noise_12": {
     "subtitle": "sound.wots.n_noise_12",
-    "sounds": ["wots:n_noise_12"]
+    "sounds": [
+      "wots:n_noise_12"
+    ]
   },
   "n_noise_13": {
     "subtitle": "sound.wots.n_noise_13",
-    "sounds": ["wots:n_noise_13"]
+    "sounds": [
+      "wots:n_noise_13"
+    ]
   },
   "n_noise_14": {
     "subtitle": "sound.wots.n_noise_14",
-    "sounds": ["wots:n_noise_14"]
+    "sounds": [
+      "wots:n_noise_14"
+    ]
   },
   "n_noise_15": {
     "subtitle": "sound.wots.n_noise_15",
-    "sounds": ["wots:n_noise_15"]
+    "sounds": [
+      "wots:n_noise_15"
+    ]
   },
-  "trashed_1": {
-    "subtitle": "sound.wots.trashed_1",
-    "sounds": ["wots:trashed_1"]
+  "gabe_line_1": {
+    "subtitle": "sound.wots.gabe_line_1",
+    "sounds": [
+      "wots:gabe_line_1"
+    ]
   },
-  "trashed_5": {
-    "subtitle": "sound.wots.trashed_5",
-    "sounds": ["wots:trashed_5"]
+  "gabe_line_2": {
+    "subtitle": "sound.wots.gabe_line_2",
+    "sounds": [
+      "wots:gabe_line_2"
+    ]
   },
-  "trashed_10": {
-    "subtitle": "sound.wots.trashed_10",
-    "sounds": ["wots:trashed_10"]
+  "gabe_line_3": {
+    "subtitle": "sound.wots.gabe_line_3",
+    "sounds": [
+      "wots:gabe_line_3"
+    ]
   },
-  "trashed_15": {
-    "subtitle": "sound.wots.trashed_15",
-    "sounds": ["wots:trashed_15"]
+  "gabe_line_4": {
+    "subtitle": "sound.wots.gabe_line_4",
+    "sounds": [
+      "wots:gabe_line_4"
+    ]
   },
-  "trashed_20": {
-    "subtitle": "sound.wots.trashed_20",
-    "sounds": ["wots:trashed_20"]
+  "gabe_line_5": {
+    "subtitle": "sound.wots.gabe_line_5",
+    "sounds": [
+      "wots:gabe_line_5"
+    ]
   },
-  "trashed_25": {
-    "subtitle": "sound.wots.trashed_25",
-    "sounds": ["wots:trashed_25"]
+  "gabe_line_6": {
+    "subtitle": "sound.wots.gabe_line_6",
+    "sounds": [
+      "wots:gabe_line_6"
+    ]
   },
-  "trashed_30": {
-    "subtitle": "sound.wots.trashed_30",
-    "sounds": ["wots:trashed_30"]
+  "gabe_line_7": {
+    "subtitle": "sound.wots.gabe_line_7",
+    "sounds": [
+      "wots:gabe_line_7"
+    ]
   },
-  "trashed_35": {
-    "subtitle": "sound.wots.trashed_35",
-    "sounds": ["wots:trashed_35"]
+  "gabe_line_8": {
+    "subtitle": "sound.wots.gabe_line_8",
+    "sounds": [
+      "wots:gabe_line_8"
+    ]
   },
-  "trashed_40": {
-    "subtitle": "sound.wots.trashed_40",
-    "sounds": ["wots:trashed_40"]
+  "gabe_line_9": {
+    "subtitle": "sound.wots.gabe_line_9",
+    "sounds": [
+      "wots:gabe_line_9"
+    ]
   },
-  "trashed_50": {
-    "subtitle": "sound.wots.trashed_50",
-    "sounds": ["wots:trashed_50"]
+  "gabe_line_10": {
+    "subtitle": "sound.wots.gabe_line_10",
+    "sounds": [
+      "wots:gabe_line_10"
+    ]
   },
-  "trashed_69": {
-    "subtitle": "sound.wots.trashed_69",
-    "sounds": ["wots:trashed_69"]
+  "gabe_line_11": {
+    "subtitle": "sound.wots.gabe_line_11",
+    "sounds": [
+      "wots:gabe_line_11"
+    ]
   },
-  "trashed_70": {
-    "subtitle": "sound.wots.trashed_70",
-    "sounds": ["wots:trashed_70"]
+  "gabe_line_12": {
+    "subtitle": "sound.wots.gabe_line_12",
+    "sounds": [
+      "wots:gabe_line_12"
+    ]
+  },
+  "gabe_line_13": {
+    "subtitle": "sound.wots.gabe_line_13",
+    "sounds": [
+      "wots:gabe_line_13"
+    ]
+  },
+  "gabe_line_14": {
+    "subtitle": "sound.wots.gabe_line_14",
+    "sounds": [
+      "wots:gabe_line_14"
+    ]
+  },
+  "gabe_line_15": {
+    "subtitle": "sound.wots.gabe_line_15",
+    "sounds": [
+      "wots:gabe_line_15"
+    ]
+  },
+  "gabe_line_16": {
+    "subtitle": "sound.wots.gabe_line_16",
+    "sounds": [
+      "wots:gabe_line_16"
+    ]
+  },
+  "gabe_line_17": {
+    "subtitle": "sound.wots.gabe_line_17",
+    "sounds": [
+      "wots:gabe_line_17"
+    ]
+  },
+  "gabe_line_18": {
+    "subtitle": "sound.wots.gabe_line_18",
+    "sounds": [
+      "wots:gabe_line_18"
+    ]
+  },
+  "gabe_line_19": {
+    "subtitle": "sound.wots.gabe_line_19",
+    "sounds": [
+      "wots:gabe_line_19"
+    ]
+  },
+  "gabe_line_20": {
+    "subtitle": "sound.wots.gabe_line_20",
+    "sounds": [
+      "wots:gabe_line_20"
+    ]
   },
   "duckler_break": {
     "subtitle": "sound.wots.duckler_break",
-    "sounds": ["wots:duckler_break"]
+    "sounds": [
+      "wots:duckler_break"
+    ]
   },
   "duckler_step": {
     "subtitle": "sound.wots.duckler_step",
-    "sounds": ["wots:duckler_step"]
+    "sounds": [
+      "wots:duckler_step"
+    ]
   },
   "duckler_place": {
     "subtitle": "sound.wots.duckler_place",
-    "sounds": ["wots:duckler_place"]
+    "sounds": [
+      "wots:duckler_place"
+    ]
   },
   "duckler_hit": {
     "subtitle": "sound.wots.duckler_hit",
-    "sounds": ["wots:duckler_hit"]
+    "sounds": [
+      "wots:duckler_hit"
+    ]
   },
   "duckler_fall": {
     "subtitle": "sound.wots.duckler_fall",
-    "sounds": ["wots:duckler_fall"]
+    "sounds": [
+      "wots:duckler_fall"
+    ]
   },
   "plush_break": {
     "subtitle": "sound.wots.plush_break",
-    "sounds": ["wots:plush_break"]
+    "sounds": [
+      "wots:plush_break"
+    ]
   },
   "plush_step": {
     "subtitle": "sound.wots.plush_step",
-    "sounds": ["wots:plush_step"]
+    "sounds": [
+      "wots:plush_step"
+    ]
   },
   "plush_place": {
     "subtitle": "sound.wots.plush_place",
-    "sounds": ["wots:plush_place"]
+    "sounds": [
+      "wots:plush_place"
+    ]
   },
   "plush_hit": {
     "subtitle": "sound.wots.plush_hit",
-    "sounds": ["wots:plush_hit"]
+    "sounds": [
+      "wots:plush_hit"
+    ]
   },
   "plush_fall": {
     "subtitle": "sound.wots.plush_fall",
-    "sounds": ["wots:plush_fall"]
+    "sounds": [
+      "wots:plush_fall"
+    ]
   },
   "tv_break": {
     "subtitle": "sound.wots.tv_break",
-    "sounds": ["wots:tv_break"]
+    "sounds": [
+      "wots:tv_break"
+    ]
   },
   "tv_step": {
     "subtitle": "sound.wots.tv_step",
-    "sounds": ["wots:tv_step"]
+    "sounds": [
+      "wots:tv_step"
+    ]
   },
   "tv_place": {
     "subtitle": "sound.wots.tv_place",
-    "sounds": ["wots:tv_place"]
+    "sounds": [
+      "wots:tv_place"
+    ]
   },
   "tv_hit": {
     "subtitle": "sound.wots.tv_hit",
-    "sounds": ["wots:tv_hit"]
+    "sounds": [
+      "wots:tv_hit"
+    ]
   },
   "tv_fall": {
     "subtitle": "sound.wots.tv_fall",
-    "sounds": ["wots:tv_fall"]
+    "sounds": [
+      "wots:tv_fall"
+    ]
   },
   "tv_use": {
     "subtitle": "sound.wots.tv_use",
-    "sounds": ["wots:tv_use"]
-  },
-  "static": {
-    "subtitle": "sound.wots.static",
-    "sounds": ["wots:static"]
+    "sounds": [
+      "wots:tv_use"
+    ]
   },
   "duck_sound": {
     "subtitle": "sound.wots.duck_sound",
-    "sounds": ["wots:duck_sound"]
+    "sounds": [
+      "wots:duck_sound"
+    ]
+  },
+  "uzi_plush_angy_1": {
+    "subtitle": "sound.wots.uzi_plush_angy_1",
+    "sounds": [
+      "wots:uzi_plush_angy_1_take1",
+      "wots:uzi_plush_angy_1_take2"
+    ]
+  },
+  "uzi_plush_angy_2": {
+    "subtitle": "sound.wots.uzi_plush_angy_2",
+    "sounds": [
+      "wots:uzi_plush_angy_2_take1",
+      "wots:uzi_plush_angy_2_take2"
+    ]
+  },
+  "uzi_plush_angy_3": {
+    "subtitle": "sound.wots.uzi_plush_angy_3",
+    "sounds": [
+      "wots:uzi_plush_angy_3_take1",
+      "wots:uzi_plush_angy_3_take2"
+    ]
+  },
+  "uzi_plush_angyaf_1": {
+    "subtitle": "sound.wots.uzi_plush_angyaf_1",
+    "sounds": [
+      "wots:uzi_plush_angyaf_1_take1",
+      "wots:uzi_plush_angyaf_1_take2"
+    ]
+  },
+  "uzi_plush_angyaf_2": {
+    "subtitle": "sound.wots.uzi_plush_angyaf_2",
+    "sounds": [
+      "wots:uzi_plush_angyaf_2_take1",
+      "wots:uzi_plush_angyaf_2_take2"
+    ]
+  },
+  "uzi_plush_angyaf_3": {
+    "subtitle": "sound.wots.uzi_plush_angyaf_3",
+    "sounds": [
+      "wots:uzi_plush_angyaf_3_take1",
+      "wots:uzi_plush_angyaf_3_take2"
+    ]
+  },
+  "uzi_plush_default_1": {
+    "subtitle": "sound.wots.uzi_plush_default_1",
+    "sounds": [
+      "wots:uzi_plush_default_1_take1",
+      "wots:uzi_plush_default_1_take2"
+    ]
+  },
+  "uzi_plush_default_10": {
+    "subtitle": "sound.wots.uzi_plush_default_10",
+    "sounds": [
+      "wots:uzi_plush_default_10_take1",
+      "wots:uzi_plush_default_10_take2"
+    ]
+  },
+  "uzi_plush_default_2": {
+    "subtitle": "sound.wots.uzi_plush_default_2",
+    "sounds": [
+      "wots:uzi_plush_default_2_take1",
+      "wots:uzi_plush_default_2_take2"
+    ]
+  },
+  "uzi_plush_default_3": {
+    "subtitle": "sound.wots.uzi_plush_default_3",
+    "sounds": [
+      "wots:uzi_plush_default_3_take1",
+      "wots:uzi_plush_default_3_take2"
+    ]
+  },
+  "uzi_plush_default_4": {
+    "subtitle": "sound.wots.uzi_plush_default_4",
+    "sounds": [
+      "wots:uzi_plush_default_4_take1",
+      "wots:uzi_plush_default_4_take2"
+    ]
+  },
+  "uzi_plush_default_5": {
+    "subtitle": "sound.wots.uzi_plush_default_5",
+    "sounds": [
+      "wots:uzi_plush_default_5_take1",
+      "wots:uzi_plush_default_5_take2"
+    ]
+  },
+  "uzi_plush_default_6": {
+    "subtitle": "sound.wots.uzi_plush_default_6",
+    "sounds": [
+      "wots:uzi_plush_default_6_take1",
+      "wots:uzi_plush_default_6_take2"
+    ]
+  },
+  "uzi_plush_default_7": {
+    "subtitle": "sound.wots.uzi_plush_default_7",
+    "sounds": [
+      "wots:uzi_plush_default_7_take1",
+      "wots:uzi_plush_default_7_take2"
+    ]
+  },
+  "uzi_plush_default_8": {
+    "subtitle": "sound.wots.uzi_plush_default_8",
+    "sounds": [
+      "wots:uzi_plush_default_8_take1",
+      "wots:uzi_plush_default_8_take2"
+    ]
+  },
+  "uzi_plush_default_9": {
+    "subtitle": "sound.wots.uzi_plush_default_9",
+    "sounds": [
+      "wots:uzi_plush_default_9_take1",
+      "wots:uzi_plush_default_9_take2"
+    ]
+  },
+  "uzi_plush_drunk_1": {
+    "subtitle": "sound.wots.uzi_plush_drunk_1",
+    "sounds": [
+      "wots:uzi_plush_drunk_1_take1",
+      "wots:uzi_plush_drunk_1_take2"
+    ]
+  },
+  "uzi_plush_drunk_2": {
+    "subtitle": "sound.wots.uzi_plush_drunk_2",
+    "sounds": [
+      "wots:uzi_plush_drunk_2_take1",
+      "wots:uzi_plush_drunk_2_take2"
+    ]
+  },
+  "uzi_plush_drunk_3": {
+    "subtitle": "sound.wots.uzi_plush_drunk_3",
+    "sounds": [
+      "wots:uzi_plush_drunk_3_take1",
+      "wots:uzi_plush_drunk_3_take2"
+    ]
+  },
+  "uzi_plush_drunk_4": {
+    "subtitle": "sound.wots.uzi_plush_drunk_4",
+    "sounds": [
+      "wots:uzi_plush_drunk_4_take1",
+      "wots:uzi_plush_drunk_4_take2"
+    ]
+  },
+  "uzi_plush_drunk_5": {
+    "subtitle": "sound.wots.uzi_plush_drunk_5",
+    "sounds": [
+      "wots:uzi_plush_drunk_5_take1",
+      "wots:uzi_plush_drunk_5_take2"
+    ]
+  },
+  "uzi_plush_happy_1": {
+    "subtitle": "sound.wots.uzi_plush_happy_1",
+    "sounds": [
+      "wots:uzi_plush_happy_1_take1",
+      "wots:uzi_plush_happy_1_take2"
+    ]
+  },
+  "uzi_plush_happy_2": {
+    "subtitle": "sound.wots.uzi_plush_happy_2",
+    "sounds": [
+      "wots:uzi_plush_happy_2_take1",
+      "wots:uzi_plush_happy_2_take2"
+    ]
+  },
+  "uzi_plush_happy_3": {
+    "subtitle": "sound.wots.uzi_plush_happy_3",
+    "sounds": [
+      "wots:uzi_plush_happy_3_take1",
+      "wots:uzi_plush_happy_3_take2"
+    ]
+  },
+  "uzi_plush_ohno_1": {
+    "subtitle": "sound.wots.uzi_plush_ohno_1",
+    "sounds": [
+      "wots:uzi_plush_ohno_1_take1",
+      "wots:uzi_plush_ohno_1_take2"
+    ]
+  },
+  "uzi_plush_ohno_2": {
+    "subtitle": "sound.wots.uzi_plush_ohno_2",
+    "sounds": [
+      "wots:uzi_plush_ohno_2_take1",
+      "wots:uzi_plush_ohno_2_take2"
+    ]
+  },
+  "uzi_plush_ohno_3": {
+    "subtitle": "sound.wots.uzi_plush_ohno_3",
+    "sounds": [
+      "wots:uzi_plush_ohno_3_take1",
+      "wots:uzi_plush_ohno_3_take2"
+    ]
+  },
+  "uzi_plush_sadge_1": {
+    "subtitle": "sound.wots.uzi_plush_sadge_1",
+    "sounds": [
+      "wots:uzi_plush_sadge_1_take1",
+      "wots:uzi_plush_sadge_1_take2"
+    ]
+  },
+  "uzi_plush_sadge_2": {
+    "subtitle": "sound.wots.uzi_plush_sadge_2",
+    "sounds": [
+      "wots:uzi_plush_sadge_2_take1",
+      "wots:uzi_plush_sadge_2_take2"
+    ]
+  },
+  "uzi_plush_sadge_3": {
+    "subtitle": "sound.wots.uzi_plush_sadge_3",
+    "sounds": [
+      "wots:uzi_plush_sadge_3_take1",
+      "wots:uzi_plush_sadge_3_take2"
+    ]
+  },
+  "uzi_plush_scaredaf_1": {
+    "subtitle": "sound.wots.uzi_plush_scaredaf_1",
+    "sounds": [
+      "wots:uzi_plush_scaredaf_1_take1",
+      "wots:uzi_plush_scaredaf_1_take2"
+    ]
+  },
+  "uzi_plush_scaredaf_2": {
+    "subtitle": "sound.wots.uzi_plush_scaredaf_2",
+    "sounds": [
+      "wots:uzi_plush_scaredaf_2_take1",
+      "wots:uzi_plush_scaredaf_2_take2"
+    ]
+  },
+  "uzi_plush_scaredaf_3": {
+    "subtitle": "sound.wots.uzi_plush_scaredaf_3",
+    "sounds": [
+      "wots:uzi_plush_scaredaf_3_take1",
+      "wots:uzi_plush_scaredaf_3_take2"
+    ]
+  },
+  "uzi_plush_smirk_1": {
+    "subtitle": "sound.wots.uzi_plush_smirk_1",
+    "sounds": [
+      "wots:uzi_plush_smirk_1_take1",
+      "wots:uzi_plush_smirk_1_take2"
+    ]
+  },
+  "uzi_plush_smirk_2": {
+    "subtitle": "sound.wots.uzi_plush_smirk_2",
+    "sounds": [
+      "wots:uzi_plush_smirk_2_take1",
+      "wots:uzi_plush_smirk_2_take2"
+    ]
+  },
+  "uzi_plush_smirk_3": {
+    "subtitle": "sound.wots.uzi_plush_smirk_3",
+    "sounds": [
+      "wots:uzi_plush_smirk_3_take1",
+      "wots:uzi_plush_smirk_3_take2"
+    ]
+  },
+  "uzi_plush_spooked_1": {
+    "subtitle": "sound.wots.uzi_plush_spooked_1",
+    "sounds": [
+      "wots:uzi_plush_spooked_1_take1",
+      "wots:uzi_plush_spooked_1_take2"
+    ]
+  },
+  "uzi_plush_spooked_2": {
+    "subtitle": "sound.wots.uzi_plush_spooked_2",
+    "sounds": [
+      "wots:uzi_plush_spooked_2_take1",
+      "wots:uzi_plush_spooked_2_take2"
+    ]
+  },
+  "uzi_plush_spooked_3": {
+    "subtitle": "sound.wots.uzi_plush_spooked_3",
+    "sounds": [
+      "wots:uzi_plush_spooked_3_take1",
+      "wots:uzi_plush_spooked_3_take2"
+    ]
+  },
+  "uzi_plush_traumatized_1": {
+    "subtitle": "sound.wots.uzi_plush_traumatized_1",
+    "sounds": [
+      "wots:uzi_plush_traumatized_1_take1",
+      "wots:uzi_plush_traumatized_1_take2"
+    ]
+  },
+  "uzi_plush_traumatized_2": {
+    "subtitle": "sound.wots.uzi_plush_traumatized_2",
+    "sounds": [
+      "wots:uzi_plush_traumatized_2_take1",
+      "wots:uzi_plush_traumatized_2_take2"
+    ]
+  },
+  "uzi_plush_traumatized_3": {
+    "subtitle": "sound.wots.uzi_plush_traumatized_3",
+    "sounds": [
+      "wots:uzi_plush_traumatized_3_take1",
+      "wots:uzi_plush_traumatized_3_take2"
+    ]
+  },
+  "uzi_plush_unamused_1": {
+    "subtitle": "sound.wots.uzi_plush_unamused_1",
+    "sounds": [
+      "wots:uzi_plush_unamused_1_take1",
+      "wots:uzi_plush_unamused_1_take2"
+    ]
+  },
+  "uzi_plush_unamused_2": {
+    "subtitle": "sound.wots.uzi_plush_unamused_2",
+    "sounds": [
+      "wots:uzi_plush_unamused_2_take1",
+      "wots:uzi_plush_unamused_2_take2"
+    ]
+  },
+  "uzi_plush_unamused_3": {
+    "subtitle": "sound.wots.uzi_plush_unamused_3",
+    "sounds": [
+      "wots:uzi_plush_unamused_3_take1",
+      "wots:uzi_plush_unamused_3_take2"
+    ]
+  },
+  "uzi_plush_worried_1": {
+    "subtitle": "sound.wots.uzi_plush_worried_1",
+    "sounds": [
+      "wots:uzi_plush_worried_1_take1",
+      "wots:uzi_plush_worried_1_take2"
+    ]
+  },
+  "uzi_plush_worried_2": {
+    "subtitle": "sound.wots.uzi_plush_worried_2",
+    "sounds": [
+      "wots:uzi_plush_worried_2_take1",
+      "wots:uzi_plush_worried_2_take2"
+    ]
+  },
+  "uzi_plush_worried_3": {
+    "subtitle": "sound.wots.uzi_plush_worried_3",
+    "sounds": [
+      "wots:uzi_plush_worried_3_take1",
+      "wots:uzi_plush_worried_3_take2"
+    ]
+  },
+  "uzi_plush_worriedaf_1": {
+    "subtitle": "sound.wots.uzi_plush_worriedaf_1",
+    "sounds": [
+      "wots:uzi_plush_worriedaf_1_take1",
+      "wots:uzi_plush_worriedaf_1_take2"
+    ]
+  },
+  "uzi_plush_worriedaf_2": {
+    "subtitle": "sound.wots.uzi_plush_worriedaf_2",
+    "sounds": [
+      "wots:uzi_plush_worriedaf_2_take1",
+      "wots:uzi_plush_worriedaf_2_take2"
+    ]
+  },
+  "uzi_plush_worriedaf_3": {
+    "subtitle": "sound.wots.uzi_plush_worriedaf_3",
+    "sounds": [
+      "wots:uzi_plush_worriedaf_3_take1",
+      "wots:uzi_plush_worriedaf_3_take2"
+    ]
+  },
+  "gift_send": {
+    "subtitle": "sound.wots.gift_send",
+    "sounds": [
+      "wots:plush_place"
+    ]
+  },
+  "gift_deny": {
+    "subtitle": "sound.wots.gift_deny",
+    "sounds": [
+      "wots:plush_hit"
+    ]
+  },
+  "collection_discover": {
+    "subtitle": "sound.wots.collection_discover",
+    "sounds": [
+      "wots:plush_place"
+    ]
   }
 }

@@ -1,22 +1,20 @@
 package net.wots.item.accessory;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Implement this on any plushie accessory Item (hat or back slot).
  * The key handler calls {@link #playNextPlushieSound} when the keybind fires.
- *
- * The implementation mirrors UziPlushBlockEntity's shuffled-queue logic so
- * each accessory slot has its own independent sound state.
  */
 public interface PlushieSoundAccessory {
 
     /**
      * Play the next sound in this accessory's sequence.
-     * Called server-side, so use {@code world.playSound(null, …)}.
+     * Called server-side, so use {@code level.playSound(null, …)}.
      *
      * @param player the player currently wearing this accessory
+     * @param stack  the worn ItemStack (used to read variant NBT)
      */
-    void playNextPlushieSound(PlayerEntity player);
+    void playNextPlushieSound(Player player, ItemStack stack);
 }

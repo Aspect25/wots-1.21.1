@@ -1,234 +1,93 @@
 package net.wots.block.plushies.uziplush;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.wots.block.ModBlocks;
-import net.wots.block.entity.PlushieShelfBlockEntity;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.wots.block.entity.UziPlushBlockEntity;
-import net.wots.block.plushies.PlushieSoundProvider;
+import net.wots.block.plushies.AbstractPlushieBlock;
 import net.wots.sound.ModSounds;
 import net.wots.unlock.VariantUnlockManager;
 
-import java.util.*;
-import net.wots.util.ShuffledSoundQueue;
-import net.wots.util.VoxelShapeHelper;
+public class UziPlushBlock extends AbstractPlushieBlock<UziPlushVariant> {
 
-public class UziPlushBlock extends BlockWithEntity implements PlushieSoundProvider {
-
-    public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
-
-    private static final VoxelShape SHAPE_NORTH = makeShape();
-    private static final VoxelShape SHAPE_SOUTH = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 2);
-    private static final VoxelShape SHAPE_EAST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 1);
-    private static final VoxelShape SHAPE_WEST  = VoxelShapeHelper.rotateShape(SHAPE_NORTH, 3);
-
-    private static VoxelShape makeShape() {
-        return VoxelShapes.cuboid(0.1875, 0, 0.25, 0.8125, 1, 0.875);
-    }
-
-    private record SlotKey(long pos, int slot) {}
-    private static final Map<SlotKey, ShuffledSoundQueue> SHELF_QUEUES = new HashMap<>();
-
-    public UziPlushBlock(Settings settings) {
-        super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
+    public UziPlushBlock(Properties properties) {
+        super(properties, "wots:uzi_plush", "uzi",
+                UziPlushVariant.values(), UziPlushBlockEntity.SOUND_DURATIONS);
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
-        return createCodec(UziPlushBlock::new);
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(UziPlushBlock::new);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-    }
-
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
-    }
-
-    @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.ENTITYBLOCK_ANIMATED;
-    }
-
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new UziPlushBlockEntity(pos, state);
     }
 
+    // ── Unlock hooks ─────────────────────────────────────────────────────────────
+
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return null; // No server tick needed — redstone handled via neighborUpdate
+    protected void onPlushieBroken(Level level, BlockPos pos) {
+        VariantUnlockManager.clearHitCount(pos);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return switch (state.get(FACING)) {
-            case SOUTH -> SHAPE_SOUTH;
-            case EAST  -> SHAPE_EAST;
-            case WEST  -> SHAPE_WEST;
-            default    -> SHAPE_NORTH;
-        };
+    protected void onPlushiePlaced(Level level, BlockPos pos, LivingEntity placer) {
+        if (placer instanceof ServerPlayer player) {
+            VariantUnlockManager.onPlushiePlaced((ServerLevel) level, pos, player, "uzi");
+            VariantUnlockManager.checkNeighborsForUziUnlocks((ServerLevel) level, pos, player);
+        }
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext ctx) {
-        return getOutlineShape(state, world, pos, ctx);
+    protected void onPlushieInteracted(Level level, BlockPos pos, Player player) {
+        if (!level.isClientSide() && player instanceof ServerPlayer sp) {
+            VariantUnlockManager.onPlushieUsed(sp, "uzi");
+        }
     }
 
-    // ── Redstone burst: warning shot on rising edge ───────────────────────────
-    /**
-     * Fires once when redstone power turns ON (rising edge only).
-     * Plays UZI_NOISE_7 and sprays CRIT particles from the plushie's centre.
-     * Good for alarm systems, dramatic builds, or just being chaotic.
-     * Does nothing while continuously powered — only reacts to the transition.
-     */
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos,
-                               Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-        if (world.isClient) return;
-        if (!(world.getBlockEntity(pos) instanceof UziPlushBlockEntity be)) return;
+    public void attack(BlockState state, Level level, BlockPos pos, Player player) {
+        if (!level.isClientSide() && player instanceof ServerPlayer sp) {
+            VariantUnlockManager.onPlushieHit((ServerLevel) level, pos, sp, "uzi");
+        }
+        super.attack(state, level, pos, player);
+    }
 
-        boolean powered = world.isReceivingRedstonePower(pos);
+    // ── Redstone burst: warning shot on rising edge ──────────────────────────────
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos,
+                               Block sourceBlock, net.minecraft.world.level.redstone.Orientation orientation, boolean notify) {
+        super.neighborChanged(state, level, pos, sourceBlock, orientation, notify);
+        if (level.isClientSide()) return;
+        if (!(level.getBlockEntity(pos) instanceof UziPlushBlockEntity be)) return;
+
+        boolean powered = level.hasNeighborSignal(pos);
 
         if (powered && !be.wasPowered()) {
-            // Rising edge — fire the warning burst
-            world.playSound(null, pos, ModSounds.UZI_NOISE_7, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            level.playSound(null, pos, ModSounds.UZI_NOISE_7, SoundSource.BLOCKS, 1.0f, 1.0f);
 
-            // Spray CRIT particles from the plushie's centre
-            if (world instanceof ServerWorld sw) {
-                sw.spawnParticles(
+            if (level instanceof ServerLevel sw) {
+                sw.sendParticles(
                         ParticleTypes.CRIT,
                         pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
-                        18,         // count — smaller than UziHuge, she is pocket-sized
-                        0.25, 0.25, 0.25,
-                        0.2         // speed
+                        18, 0.25, 0.25, 0.25, 0.2
                 );
             }
         }
 
         be.setWasPowered(powered);
-    }
-
-    @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!state.isOf(newState.getBlock()) && world.getBlockEntity(pos) instanceof UziPlushBlockEntity be) {
-            be.stopSound();
-            VariantUnlockManager.clearHitCount(pos);
-            if (!world.isClient) {
-                ItemStack stack = new ItemStack(state.getBlock().asItem());
-                NbtCompound nbt = new NbtCompound();
-                nbt.putString("id", "wots:uzi_plush");
-                nbt.putString("Variant", be.getVariant().name());
-                stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(nbt));
-                Block.dropStack(world, pos, stack);
-            }
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
-    }
-
-    @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state,
-                         LivingEntity placer, ItemStack stack) {
-        super.onPlaced(world, pos, state, placer, stack);
-        if (world.isClient) return;
-        if (!(world.getBlockEntity(pos) instanceof UziPlushBlockEntity be)) return;
-
-        var beData = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
-        if (beData != null) {
-            NbtCompound nbt = beData.copyNbt();
-            if (nbt.contains("Variant")) {
-                try { be.setVariant(UziPlushVariant.valueOf(nbt.getString("Variant"))); }
-                catch (IllegalArgumentException ignored) {}
-            }
-        }
-
-        if (placer instanceof ServerPlayerEntity player) {
-            VariantUnlockManager.onPlushiePlaced((ServerWorld) world, pos, player, "uzi");
-            VariantUnlockManager.checkNeighborsForUziUnlocks((ServerWorld) world, pos, player);
-        }
-    }
-
-    @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
-                                 PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient && player instanceof ServerPlayerEntity sp) {
-            VariantUnlockManager.onPlushieUsed(sp, "uzi");
-        }
-
-        if (player.isSneaking()) {
-            if (world.isClient) {
-                net.minecraft.client.MinecraftClient.getInstance()
-                        .setScreen(new net.wots.client.screen.UziVariantWheelScreen(pos));
-            }
-            return ActionResult.SUCCESS;
-        }
-        onShelfInteract(world, pos, 0, player);
-        return ActionResult.SUCCESS;
-    }
-
-    @Override
-    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
-        if (!world.isClient && player instanceof ServerPlayerEntity sp) {
-            VariantUnlockManager.onPlushieHit((ServerWorld) world, pos, sp, "uzi");
-        }
-        super.onBlockBreakStart(state, world, pos, player);
-    }
-
-    // ── PlushieSoundProvider ──────────────────────────────────────────────────
-
-    @Override
-    public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
-        var be = world.getBlockEntity(shelfPos);
-
-        if (be instanceof UziPlushBlockEntity ube) {
-            if (!world.isClient) {
-                ube.playNextSound();
-            }
-            if (world.isClient) {
-                ube.triggerAnim("controller", "bounce");
-            }
-            return;
-        }
-
-        if (be instanceof PlushieShelfBlockEntity shelf) {
-            if (world.isClient) return;
-            SlotKey key = new SlotKey(shelfPos.asLong(), slot);
-            ShuffledSoundQueue queue = SHELF_QUEUES.computeIfAbsent(key,
-                    k -> new ShuffledSoundQueue(UziPlushBlockEntity.SOUND_DURATIONS));
-            SoundEvent sound = queue.tryAdvance(world.getTime());
-            if (sound == null) return;
-            world.playSound(null, shelfPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
-            shelf.triggerBounce(slot);
-        }
     }
 }

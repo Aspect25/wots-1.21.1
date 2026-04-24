@@ -3,7 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [66, 131],
 	"textures": {
-		"2": "wots:block/the_duckler"
+		"2": "wots:block/the_duckler",
+		"particle": "wots:block/custom/red"
 	},
 	"elements": [
 		{

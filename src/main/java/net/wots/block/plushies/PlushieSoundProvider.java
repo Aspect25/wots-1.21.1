@@ -1,8 +1,8 @@
 package net.wots.block.plushies;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * Implement this on any plushie Block so it works on a PlushieShelfBlock.
@@ -24,8 +24,8 @@ import net.minecraft.world.World;
  *       // ... all your existing fields and methods stay exactly the same ...
  *
  *       @Override
- *       public void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player) {
- *           if (!world.isClient) {
+ *       public void onShelfInteract(Level level, BlockPos shelfPos, int slot, Player player) {
+ *           if (!level.isClientSide()) {
  *               long currentTime = world.getTime();
  *               BlockPos key = shelfPos.add(slot, 0, 0); // unique key per slot!
  *               long cooldownEnd = SOUND_COOLDOWNS.getOrDefault(key, 0L);
@@ -36,7 +36,7 @@ import net.minecraft.world.World;
  *               soundIndex = (soundIndex + 1) % SOUNDS.size();
  *               SOUND_COOLDOWNS.put(key, currentTime + SOUND_DURATIONS_UZI.get(sound));
  *
- *               world.playSound(null, shelfPos, sound, SoundCategory.BLOCKS, 1.0f, 1.0f);
+ *               level.playSound(null, shelfPos, sound, SoundSource.BLOCKS, 1.0f, 1.0f);
  *           }
  *       }
  *   }
@@ -51,6 +51,6 @@ public interface PlushieSoundProvider {
      * @param slot     which slot (0, 1, 2) — use shelfPos.add(slot,0,0) as cooldown key
      * @param player   the player who clicked
      */
-    void onShelfInteract(World world, BlockPos shelfPos, int slot, PlayerEntity player);
+    void onShelfInteract(Level level, BlockPos shelfPos, int slot, Player player);
 
 }

@@ -1,108 +1,97 @@
 package net.wots.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.Containers;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.wots.block.entity.TrashBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TrashBlock extends BlockWithEntity {
-    public static final MapCodec<TrashBlock> CODEC = createCodec(TrashBlock::new);
+public class TrashBlock extends BaseEntityBlock {
+    public static final MapCodec<TrashBlock> CODEC = simpleCodec(TrashBlock::new);
     @Override
-    protected BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
-    public TrashBlock(Settings settings) {
-        super(settings);
+    public TrashBlock(Properties properties) {
+        super(properties);
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new TrashBlockEntity(pos, state);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return validateTicker(type, ModBlocks.TRASH_BLOCK_ENTITY, TrashBlockEntity::tick);
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, ModBlocks.TRASH_BLOCK_ENTITY, TrashBlockEntity::tick);
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (!world.isClient) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide()) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof TrashBlockEntity trashEntity) {
-                ItemStack handStack = player.getStackInHand(Hand.MAIN_HAND);
+                ItemStack handStack = player.getItemInHand(InteractionHand.MAIN_HAND);
                 // If holding item, try to insert it
                 if (!handStack.isEmpty()) {
-                    if (trashEntity.getStack(0).isEmpty()) {
-                        trashEntity.setStack(0, handStack.copy());
-                        player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
-                        trashEntity.markDirty();
-                        return ActionResult.SUCCESS;
-                    } else if (ItemStack.areItemsAndComponentsEqual(trashEntity.getStack(0), handStack)) {
-                        int maxInsert = Math.min(handStack.getMaxCount() - trashEntity.getStack(0).getCount(), handStack.getCount());
+                    if (trashEntity.getItem(0).isEmpty()) {
+                        trashEntity.setItem(0, handStack.copy());
+                        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                        trashEntity.setChanged();
+                        return InteractionResult.SUCCESS;
+                    } else if (ItemStack.isSameItemSameComponents(trashEntity.getItem(0), handStack)) {
+                        int maxInsert = Math.min(handStack.getMaxStackSize() - trashEntity.getItem(0).getCount(), handStack.getCount());
                         if (maxInsert > 0) {
-                            trashEntity.getStack(0).increment(maxInsert);
-                            handStack.decrement(maxInsert);
-                            trashEntity.markDirty();
-                            return ActionResult.SUCCESS;
+                            trashEntity.getItem(0).grow(maxInsert);
+                            handStack.shrink(maxInsert);
+                            trashEntity.setChanged();
+                            return InteractionResult.SUCCESS;
                         }
                     }
-                } else if (!player.isSneaking()) {
+                } else if (!player.isShiftKeyDown()) {
                     // Try to extract item if empty hand
-                    if (!trashEntity.getStack(0).isEmpty()) {
-                        player.setStackInHand(Hand.MAIN_HAND, trashEntity.getStack(0).copy());
-                        trashEntity.setStack(0, ItemStack.EMPTY);
-                        trashEntity.markDirty();
-                        return ActionResult.SUCCESS;
+                    if (!trashEntity.getItem(0).isEmpty()) {
+                        player.setItemInHand(InteractionHand.MAIN_HAND, trashEntity.getItem(0).copy());
+                        trashEntity.setItem(0, ItemStack.EMPTY);
+                        trashEntity.setChanged();
+                        return InteractionResult.SUCCESS;
                     }
                 }
             }
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof TrashBlockEntity) {
-                ItemScatterer.spawn(world, pos, (TrashBlockEntity) blockEntity);
-                world.updateComparators(pos, this);
-            }
-            super.onStateReplaced(state, world, pos, newState, moved);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, boolean moved) {
+        super.affectNeighborsAfterRemoval(state, level, pos, moved);
     }
 
 
-    @Override
-    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
-        tooltip.add(Text.translatable("block.wots.trash_block.tooltip1").formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("block.wots.trash_block.tooltip2").formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("block.wots.trash_block.tooltip3").formatted(Formatting.GRAY, Formatting.BOLD));
-        tooltip.add(Text.translatable("block.wots.trash_block.tooltip4").formatted(Formatting.GRAY, Formatting.BOLD));
-    }
+    // appendHoverText moved to BlockItem/Item in MC 26.1; handled in TrashBlockItem instead
 }
